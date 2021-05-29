@@ -89,7 +89,7 @@ const showProjects = () => {
 
         // add delete buttons to each project item
         let projectDeleteButton = document.createElement("div");
-        projectDeleteButton.classList = "project-delete-button"
+        projectDeleteButton.classList = "project-delete-button";
         projectDeleteButton.id = projects.indexOf(project);
         projectDeleteButton.textContent = "x";
         projectContainer.appendChild(projectDeleteButton);
@@ -266,3 +266,6 @@ const addNewTodoDiv = () => {
 
 showProjects();
 showTodos(selectedProject);
+
+// highlight default "Random Tasks" project on page load
+const randomTasksProject = document.getElementById("0").classList.add("clicked");

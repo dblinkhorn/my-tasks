@@ -35,7 +35,7 @@ hr {
     width: 260px;
     border: 0;
     border-top: 2px solid #ccc;
-    margin: 5px 0px;
+    margin: 8px 0px;
     padding: 0;
 }
 
@@ -69,6 +69,7 @@ hr {
   padding: 4px;
   border: 1px solid rgba(0, 0, 0, 0.0);
   border-radius: 5px;
+  margin: 8px 0px;
 }
 
 .project-container:hover .project-delete-button {
