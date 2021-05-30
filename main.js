@@ -199,14 +199,22 @@ const addNewProjectDiv = () => {
     })
 }
 
+let checkIfAllEmptyProjects = () => {
+    for (project in projects) {
+      if (project === undefined) {
+        return undefined;
+      } return true;
+    }
+  }
+
 const addNewTodoButton = document.getElementById("add-new-todo");
 addNewTodoButton.addEventListener("click", () => {
-    if (projects.length !== 0) {
-        addNewTodoDiv();
-    } else {
-        alert("You must create a project to add tasks.")
-    }
-});
+    let checkProjects = checkIfAllEmptyProjects();
+    if (checkProjects === undefined) {
+        alert("You must create a project before adding tasks.");
+        return;
+    } addNewTodoDiv();
+})
 
 let newTodoButtonClicked = false;
 
