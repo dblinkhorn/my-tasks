@@ -57,46 +57,55 @@ hr {
 .todo-item,
 .project-item {
     display: flex;
-    flex-direction: row;
+    grid-row: 1/2;
 }
 
 .project-container,
 .todo-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px;
-  border: 1px solid rgba(0, 0, 0, 0.0);
-  border-radius: 5px;
-  margin: 8px 0px;
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: auto auto auto auto;
+    align-items: center;
+    padding: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.0);
+    border-radius: 5px;
+    margin: 8px 0px;
 }
 
 .project-container:hover .project-delete-button {
-  display: block;
+    display: block;
 }
 
 .project-item {
-  word-wrap: break-word;
-  width: 100%;
-  max-width: 230px;
-  margin-left: 3px;
+    word-wrap: break-word;
+    width: 100%;
+    max-width: 230px;
+    margin-left: 3px;
 }
 
 .todo-container:hover .todo-delete-button {
-  display: block;
+    display: block;
+}
+
+.todo-container:hover .todo-expand-button {
+    display: block;
+    float: right;
 }
 
 .todo-item {
-  word-wrap: break-word;
-  max-width: 800px;
-  margin-left: 3px;
+    word-wrap: break-word;
+    max-width: 800px;
+    width: 100%;
+    margin-left: 3px;
 }
 
 .todo-delete-button,
-.project-delete-button {
+.project-delete-button,
+.todo-expand-button {
     display: none;
+    grid-row: 1;
     margin-right: 3px;
+    margin-left: 16px;
 }
 
 button {
@@ -122,16 +131,29 @@ button {
     border: 1px solid #57707d;
     border-radius: 6px;
 }
+
+.add-todo-form {
+    margin-left: 32px;
+}
   
-.todo-title-input {
-    margin-top: 20px;
+input[type=text] {
     padding-left: 8px;
-    width: 600px;
     outline: 0;
     background-color: white;
     height: 40px;
     border: 1px solid #7d97a5;
     border-radius: 6px;
+}
+
+input[type=date],
+select {
+    width: 200px;
+}
+
+label {
+    margin-top: 12px;
+    margin-bottom: 5px;
+    font-size: 0.8em;
 }
   
 .add-new-project {
@@ -181,4 +203,28 @@ button:hover {
 .clicked,
 .clicked:hover {
     background-color: #303e45;
+}
+
+.todo-description-value {
+    margin-top: 4px;
+    margin-left: 20px;
+    font-size: 0.8em;
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.todo-priority-value {
+    margin-top: 4px;
+    margin-left: 20px;
+    font-size: 0.8em;
+    grid-column: 1;
+    grid-row: 3;
+}
+
+.todo-due-date-value {
+    margin-top: 4px;
+    margin-left: 20px;
+    font-size: 0.8em;
+    grid-column: 1;
+    grid-row: 4;
 }

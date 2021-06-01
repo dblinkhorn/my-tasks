@@ -1,9 +1,10 @@
 const ProjectFactory = (projectTitle) => {
     return {
         projectTitle: projectTitle,
-        todos: []
-    };
-};
+        todos: [],
+        finishedTodos: []
+    }
+}
 
 const TodoFactory = (todoTitle, todoDescription, todoPriority, todoDueDate) => {
     return {
@@ -20,17 +21,25 @@ projects.push(
     ProjectFactory("Random Tasks")
 )
 
-projects[0].todos.push(TodoFactory("This is an example task. Delete it and begin creating your own!", "description", "priority", "due date"))
+projects[0].todos.push(
+    TodoFactory(
+        "This is an example task. Delete it and begin creating your own!",
+        "This is just an example task. Feel free to delete it!",
+        "Low",
+        "No Due Date"
+    )
+)
 
 let selectedProject = 0;
 
+// highlights the project clicked by user
 const highlightSelectedProject = (selectedProject) => {
     let projectContainers = document.querySelectorAll(".project-container");
     projectContainers.forEach( (container) => {
-      container.classList.remove("clicked");
-      console.log(selectedProject.toString());
-      if (container.id === selectedProject.toString()) {
-          container.classList.add("clicked");
+        container.classList.remove("clicked");
+        console.log(selectedProject.toString());
+        if (container.id === selectedProject.toString()) {
+            container.classList.add("clicked");
       } return;
     })
 }
@@ -39,41 +48,71 @@ const highlightSelectedProject = (selectedProject) => {
 const showTodos = (clickedProject) => {
     const todosDiv = document.getElementById("todos-list");
     todosDiv.textContent = "";
-    // try/catch block to prevent undefined error when deleting project which contains todos
-    // try {
-        projects[clickedProject].todos.forEach((todo) => {
-            let todoContainer = document.createElement("div");
-            todoContainer.classList = "todo-container hover pointer";
-            let todoItem = document.createElement("div");
-            todoItem.classList = "todo-item";
-            todoItem.id = projects[clickedProject].todos.indexOf(todo);
-            // console.log(todoItem)
-            let todoItemIndex = projects[clickedProject].todos.indexOf(todo);
-            console.log(todoItemIndex);
-            todoItem.textContent = projects[clickedProject].todos[todoItemIndex].todoTitle;
-            todosDiv.appendChild(todoContainer);
-            todoContainer.appendChild(todoItem);
-    
-            // add delete buttons to each project item
-            let todoDeleteButton = document.createElement("div");
-            todoDeleteButton.classList = "todo-delete-button"
-            todoDeleteButton.id = projects[clickedProject].todos.indexOf(todo);
-            todoDeleteButton.textContent = "x";
-            todoContainer.appendChild(todoDeleteButton);
-    
-            // defines behavior when a delete button is clicked
-            let todoDeleteButtons = document.querySelectorAll(".todo-delete-button");
-            todoDeleteButtons.forEach((todoDeleteButton) => {
-                todoDeleteButton.addEventListener("click", (event) => {
-                    let targetTodoIndex = Number(event.target.id);
-                    delete projects[clickedProject].todos[targetTodoIndex];
-                    event.target.parentElement.remove();
-                })
+
+    projects[clickedProject].todos.forEach((todo) => {
+        let todoContainer = document.createElement("div");
+        todoContainer.classList = "todo-container hover pointer";
+
+        let todoItem = document.createElement("div");
+        todoItem.classList = "todo-item";
+        todoItem.id = projects[clickedProject].todos.indexOf(todo);
+
+        let todoItemIndex = projects[clickedProject].todos.indexOf(todo);
+        todoItem.textContent = projects[clickedProject].todos[todoItemIndex].todoTitle;
+        todosDiv.appendChild(todoContainer);
+        todoContainer.appendChild(todoItem);
+
+        // add expand buttons to each todo item
+        let todoExpandButton = document.createElement("div");
+        todoExpandButton.classList = "todo-expand-button";
+        todoExpandButton.id = projects[clickedProject].todos.indexOf(todo);
+        todoExpandButton.textContent = "v";
+        todoContainer.appendChild(todoExpandButton);
+
+        let todoExpandButtons = document.querySelectorAll(".todo-expand-button");
+        todoExpandButtons.forEach((todoExpandButton) => {
+            todoExpandButton.addEventListener("click", (event) => {
+                let targetExpandIndex = Number(event.target.id);
+                
+                const todoDescriptionValue = document.createElement("div");
+                const todoPriorityValue = document.createElement("div");
+                const todoDueDateValue = document.createElement("div");
+
+                todoDescriptionValue.id = "todo-description-value";
+                todoDescriptionValue.classList = "todo-description-value";
+                todoDescriptionValue.textContent = `Description: ${projects[clickedProject].todos[targetExpandIndex].todoDescription}`;
+
+                todoPriorityValue.id = "todo-priority-value";
+                todoPriorityValue.classList = "todo-priority-value";
+                todoPriorityValue.textContent = `Priority: ${projects[clickedProject].todos[targetExpandIndex].todoPriority}`;
+                
+                todoDueDateValue.id = "todo-due-date-value";
+                todoDueDateValue.classList = "todo-due-date-value";
+                todoDueDateValue.textContent = `Due date: ${projects[clickedProject].todos[targetExpandIndex].todoDueDate}`;
+
+                todoContainer.appendChild(todoDescriptionValue);
+                todoContainer.appendChild(todoPriorityValue);
+                todoContainer.appendChild(todoDueDateValue);
             })
         })
-    // } catch(error) {
-    //     return;
-    // }
+
+        // add delete buttons to each todo item
+        let todoDeleteButton = document.createElement("div");
+        todoDeleteButton.classList = "todo-delete-button"
+        todoDeleteButton.id = projects[clickedProject].todos.indexOf(todo);
+        todoDeleteButton.textContent = "x";
+        todoContainer.appendChild(todoDeleteButton);
+
+        // defines behavior when a delete button is clicked
+        let todoDeleteButtons = document.querySelectorAll(".todo-delete-button");
+        todoDeleteButtons.forEach((todoDeleteButton) => {
+            todoDeleteButton.addEventListener("click", (event) => {
+                let targetTodoIndex = Number(event.target.id);
+                delete projects[clickedProject].todos[targetTodoIndex];
+                event.target.parentElement.remove();
+            })
+        })
+    })
 }
 
 // display all project objects from projects array
@@ -122,7 +161,7 @@ const showProjects = () => {
 
 const addNewProjectButton = document.getElementById("add-new-project");
 addNewProjectButton.addEventListener("click", () => {
-        addNewProjectDiv();
+    addNewProjectDiv();
 });
 
 let newProjectButtonClicked = false;
@@ -199,15 +238,19 @@ const addNewProjectDiv = () => {
     })
 }
 
+// checks to see if there are no projects
 let checkIfAllEmptyProjects = () => {
     for (project in projects) {
-      if (project === undefined) {
-        return undefined;
-      } return true;
+        if (project === undefined) {
+            return undefined;
+        } return true;
     }
-  }
+}
 
 const addNewTodoButton = document.getElementById("add-new-todo");
+
+// controls what happens when add task button is clicked depending on
+// if there are no projects
 addNewTodoButton.addEventListener("click", () => {
     let checkProjects = checkIfAllEmptyProjects();
     if (checkProjects === undefined) {
@@ -218,42 +261,57 @@ addNewTodoButton.addEventListener("click", () => {
 
 let newTodoButtonClicked = false;
 
+// displays add todo form and controls logic
 const addNewTodoDiv = () => {
     if (newTodoButtonClicked) {
         return;
     }
+
     const todosDiv = document.getElementById("todos");
     const todoTitleInputField = document.createElement("input");
+    const todoTitleInputFieldLabel = document.createElement("label");
     const todoDescriptionInputField = document.createElement("input");
+    const todoDescriptionInputFieldLabel = document.createElement("label");
     const todoPrioritySelect = document.createElement("select");
+    const todoPrioritySelectLabel = document.createElement("label");
         const todoPriorityHigh = document.createElement("option");
         const todoPriorityMedium = document.createElement("option");
         const todoPriorityLow = document.createElement("option");
     const todoDueDateInputField = document.createElement("input");
+    const todoDueDateInputFieldLabel = document.createElement("label");
     const todoButtonsDiv = document.createElement("div");
     const addTodoButton = document.createElement("button");
     const cancelTodoButton = document.createElement("button");
     const addTodoForm = document.createElement("form");
-    const lineBreak = document.createElement("br");
+
+    todoTitleInputFieldLabel.setAttribute("for", "new-todo-title");
+    todoTitleInputFieldLabel.textContent = "Task Title:";
 
     todoTitleInputField.type = "text";
     todoTitleInputField.id = "new-todo-title";
+    todoTitleInputField.name = "new-todo-title";
     todoTitleInputField.required = true;
     todoTitleInputField.classList = "todo-title-input";
     todoTitleInputField.setAttribute("maxlength", 120);
+    todoTitleInputField.setAttribute("placeholder", "Enter the task to be completed");
+
+    todoDescriptionInputFieldLabel.setAttribute("for", "new-todo-description");
+    todoDescriptionInputFieldLabel.textContent = "Task description:";
 
     todoDescriptionInputField.type = "text";
     todoDescriptionInputField.id = "new-todo-description";
+    todoDescriptionInputField.name = "new-todo-description";
     todoDescriptionInputField.required = true;
     todoDescriptionInputField.classList = "todo-description-input";
     todoDescriptionInputField.setAttribute("maxlength", 120);
+    todoDescriptionInputField.setAttribute("placeholder", "Enter a description of the task");
 
-    todoDueDateInputField.type = "date";
-    todoDueDateInputField.id = "new-todo-due-date";
-    todoDueDateInputField.classList = "todo-due-date-input";
+    todoPrioritySelectLabel.setAttribute("for", "new-todo-priority");
+    todoPrioritySelectLabel.textContent = "Priority level:"
 
     todoPrioritySelect.type = "select";
     todoPrioritySelect.id = "new-todo-priority";
+    todoPrioritySelect.name = "new-todo-priority";
     todoPrioritySelect.required = true;
     todoPrioritySelect.classList = "todo-priority-select";
     todoPrioritySelect.name = "todo-priority"
@@ -265,14 +323,21 @@ const addNewTodoDiv = () => {
     todoPriorityLow.value = "low";
     todoPriorityLow.textContent = "Low";
 
+    todoDueDateInputFieldLabel.setAttribute("for", "new-todo-due-date");
+    todoDueDateInputFieldLabel.textContent = "Due date:";
+
+    todoDueDateInputField.type = "date";
+    todoDueDateInputField.id = "new-todo-due-date";
+    todoDueDateInputField.name = "new-todo-due-date";
+    todoDueDateInputField.classList = "todo-due-date-input";
+
     todoButtonsDiv.classList = "new-todo-buttons";
 
     addTodoForm.id = "add-todo-form";
-    addTodoForm.class = "add-todo-form";
+    addTodoForm.classList = "add-todo-form";
 
     addTodoButton.type = "submit";
     addTodoButton.value = "Add";
-    todoTitleInputField.setAttribute("placeholder", "Enter task description");
 
     cancelTodoButton.value = "Cancel";
 
@@ -280,18 +345,16 @@ const addNewTodoDiv = () => {
     cancelTodoButton.textContent = "Cancel";
 
     todosDiv.appendChild(addTodoForm);
+    addTodoForm.appendChild(todoTitleInputFieldLabel);
     addTodoForm.appendChild(todoTitleInputField);
-    addTodoForm.appendChild(lineBreak);
-    addTodoForm.appendChild(lineBreak);
+    addTodoForm.appendChild(todoDescriptionInputFieldLabel);
     addTodoForm.appendChild(todoDescriptionInputField);
-    addTodoForm.appendChild(lineBreak);
-    addTodoForm.appendChild(lineBreak);
+    addTodoForm.appendChild(todoPrioritySelectLabel);
     addTodoForm.appendChild(todoPrioritySelect);
     todoPrioritySelect.appendChild(todoPriorityHigh);
     todoPrioritySelect.appendChild(todoPriorityMedium);
     todoPrioritySelect.appendChild(todoPriorityLow);
-    addTodoForm.appendChild(lineBreak);
-    addTodoForm.appendChild(lineBreak);
+    addTodoForm.appendChild(todoDueDateInputFieldLabel);
     addTodoForm.appendChild(todoDueDateInputField);
     addTodoForm.appendChild(todoButtonsDiv);
     todoButtonsDiv.appendChild(addTodoButton);
@@ -304,8 +367,9 @@ const addNewTodoDiv = () => {
 
     let addTodoFormContainer = document.getElementById("add-todo-form");
 
-    // when submit action is clicked then add the new todo to the todos array &
-    // remove the form elements, re-display the todos array in the todos div
+    // when submit action is clicked then add the new todo to the todos array
+    // of the currently clicked project & remove the form elements then
+    // re-display the todos array in the todos div
     addTodoForm.addEventListener("submit", function(e) {
         if (addTodoButtonClicked) {
             return;
@@ -316,9 +380,14 @@ const addNewTodoDiv = () => {
         let newTodoDescription = todoDescriptionInputField.value;
         let newTodoPriority = todoPrioritySelect.value;
         let newTodoDueDate = todoDueDateInputField.value;
-        projects[selectedProject].todos.push(TodoFactory(newTodoTitle, newTodoDescription, newTodoPriority, newTodoDueDate));
-        todoTitleInputField.remove();
-        todoButtonsDiv.remove();
+        projects[selectedProject].todos.push(
+            TodoFactory(
+                newTodoTitle,
+                newTodoDescription,
+                newTodoPriority,
+                newTodoDueDate
+            )
+        );
         showTodos(selectedProject);
         newTodoButtonClicked = false;
         addTodoFormContainer.remove();
@@ -326,7 +395,6 @@ const addNewTodoDiv = () => {
 
     // if cancel button is clicked then remove the form elements from the DOM
     cancelTodoButton.addEventListener("click", () => {
-        todoButtonsDiv.remove();
         newTodoButtonClicked = false;
         addTodoFormContainer.remove();
     })
