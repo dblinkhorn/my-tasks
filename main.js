@@ -66,39 +66,55 @@ const showTodos = (clickedProject) => {
         let todoExpandButton = document.createElement("div");
         todoExpandButton.classList = "todo-expand-button";
         todoExpandButton.id = projects[clickedProject].todos.indexOf(todo);
-        todoExpandButton.textContent = "v";
+        todoExpandButton.textContent = "MORE >";
         todoContainer.appendChild(todoExpandButton);
 
-        let todoExpandButtons = document.querySelectorAll(".todo-expand-button");
-        todoExpandButtons.forEach((todoExpandButton) => {
-            todoExpandButton.addEventListener("click", (event) => {
-                let targetExpandIndex = Number(event.target.id);
-                
-                const todoDescriptionValue = document.createElement("div");
-                const todoPriorityValue = document.createElement("div");
-                const todoDueDateValue = document.createElement("div");
+        let expandButtonClicked = false;
 
-                todoDescriptionValue.id = "todo-description-value";
-                todoDescriptionValue.classList = "todo-description-value";
-                todoDescriptionValue.textContent = `Description: ${projects[clickedProject].todos[targetExpandIndex].todoDescription}`;
+        todoExpandButton.addEventListener("click", (event) => {
+            todoExpandButton.setAttribute("display", "inline");
+            let targetExpandIndex = Number(event.target.id);
+            const todoDescriptionValue = document.createElement("div");
+            const todoPriorityValue = document.createElement("div");
+            const todoDueDateValue = document.createElement("div");
 
-                todoPriorityValue.id = "todo-priority-value";
-                todoPriorityValue.classList = "todo-priority-value";
-                todoPriorityValue.textContent = `Priority: ${projects[clickedProject].todos[targetExpandIndex].todoPriority}`;
-                
-                todoDueDateValue.id = "todo-due-date-value";
-                todoDueDateValue.classList = "todo-due-date-value";
-                todoDueDateValue.textContent = `Due date: ${projects[clickedProject].todos[targetExpandIndex].todoDueDate}`;
+            todoDescriptionValue.id = `todo-description-value-${targetExpandIndex.toString()}`;
+            todoDescriptionValue.classList = "todo-description-value";
+            todoDescriptionValue.textContent = `Description: ${projects[clickedProject].todos[targetExpandIndex].todoDescription}`;
 
-                todoContainer.appendChild(todoDescriptionValue);
-                todoContainer.appendChild(todoPriorityValue);
-                todoContainer.appendChild(todoDueDateValue);
-            })
+            todoPriorityValue.id = `todo-priority-value-${targetExpandIndex.toString()}`;
+            todoPriorityValue.classList = "todo-priority-value";
+            todoPriorityValue.textContent = `Priority: ${projects[clickedProject].todos[targetExpandIndex].todoPriority}`;
+            
+            todoDueDateValue.id = `todo-due-date-value-${targetExpandIndex.toString()}`;
+            todoDueDateValue.classList = "todo-due-date-value";
+            todoDueDateValue.textContent = `Due date: ${projects[clickedProject].todos[targetExpandIndex].todoDueDate}`;
+
+            if (expandButtonClicked) {
+                let todoDescription = document.getElementById(`todo-description-value-${targetExpandIndex.toString()}`);
+                let todoPriority = document.getElementById(`todo-priority-value-${targetExpandIndex.toString()}`);
+                let todoDueDate = document.getElementById(`todo-due-date-value-${targetExpandIndex.toString()}`);
+                todoDescription.remove();
+                todoPriority.remove();
+                todoDueDate.remove();
+                todoExpandButton.textContent = "MORE >";
+                todoContainer.classList.remove("clicked");
+                return expandButtonClicked = false;
+            }
+
+            todoContainer.appendChild(todoDescriptionValue);
+            todoContainer.appendChild(todoPriorityValue);
+            todoContainer.appendChild(todoDueDateValue);
+
+            todoExpandButton.textContent = "< LESS";
+
+            expandButtonClicked = true;
+            todoContainer.classList.add("clicked");
         })
 
         // add delete buttons to each todo item
         let todoDeleteButton = document.createElement("div");
-        todoDeleteButton.classList = "todo-delete-button"
+        todoDeleteButton.classList = "todo-delete-button";
         todoDeleteButton.id = projects[clickedProject].todos.indexOf(todo);
         todoDeleteButton.textContent = "x";
         todoContainer.appendChild(todoDeleteButton);
@@ -110,6 +126,20 @@ const showTodos = (clickedProject) => {
                 let targetTodoIndex = Number(event.target.id);
                 delete projects[clickedProject].todos[targetTodoIndex];
                 event.target.parentElement.remove();
+            })
+        })
+
+        // adds brackets over delete button on hover
+        todoDeleteButtons.forEach((todoDeleteButton) => {
+            todoDeleteButton.addEventListener("mouseover", (event) => {
+                event.target.textContent = "[x]";
+            })
+        })
+
+        // removes brackets when mouse leaves element
+        todoDeleteButtons.forEach((todoDeleteButton) => {
+            todoDeleteButton.addEventListener("mouseout", (event) => {
+                event.target.textContent = "x";
             })
         })
     })
@@ -154,6 +184,20 @@ const showProjects = () => {
                 }
                 delete projects[targetProjectIndex];
                 event.target.parentElement.remove();
+            })
+        })
+
+        // adds brackets over delete button on hover
+        projectDeleteButtons.forEach((projectDeleteButton) => {
+            projectDeleteButton.addEventListener("mouseover", (event) => {
+                event.target.textContent = "[x]";
+            })
+        })
+
+        // removes brackets when mouse leaves element
+        projectDeleteButtons.forEach((projectDeleteButton) => {
+            projectDeleteButton.addEventListener("mouseout", (event) => {
+                event.target.textContent = "x";
             })
         })
     })
@@ -285,7 +329,7 @@ const addNewTodoDiv = () => {
     const addTodoForm = document.createElement("form");
 
     todoTitleInputFieldLabel.setAttribute("for", "new-todo-title");
-    todoTitleInputFieldLabel.textContent = "Task Title:";
+    todoTitleInputFieldLabel.textContent = "Task title:";
 
     todoTitleInputField.type = "text";
     todoTitleInputField.id = "new-todo-title";
@@ -316,11 +360,11 @@ const addNewTodoDiv = () => {
     todoPrioritySelect.classList = "todo-priority-select";
     todoPrioritySelect.name = "todo-priority"
 
-    todoPriorityHigh.value = "high";
+    todoPriorityHigh.value = "High";
     todoPriorityHigh.textContent = "High";
-    todoPriorityMedium.value = "medium";
+    todoPriorityMedium.value = "Medium";
     todoPriorityMedium.textContent = "Medium";
-    todoPriorityLow.value = "low";
+    todoPriorityLow.value = "Low";
     todoPriorityLow.textContent = "Low";
 
     todoDueDateInputFieldLabel.setAttribute("for", "new-todo-due-date");
@@ -400,6 +444,7 @@ const addNewTodoDiv = () => {
     })
 }
 
+// display projects and todos on page load
 showProjects();
 showTodos(selectedProject);
 
