@@ -30,6 +30,15 @@ projects[0].todos.push(
     )
 )
 
+projects[0].finishedTodos.push(
+    TodoFactory(
+        "this is a test finished task",
+        "this is the description for it",
+        "Medium",
+        "No Due Date"
+    )
+)
+
 let selectedProject = 0;
 
 // highlights the project clicked by user
@@ -46,8 +55,8 @@ const highlightSelectedProject = (selectedProject) => {
 
 // display all todos for the selected project
 const showTodos = (clickedProject) => {
-    const todosDiv = document.getElementById("todos-list");
-    todosDiv.textContent = "";
+    const todosListDiv = document.getElementById("todos-list");
+    todosListDiv.textContent = "";
 
     projects[clickedProject].todos.forEach((todo) => {
         let todoContainer = document.createElement("div");
@@ -59,7 +68,7 @@ const showTodos = (clickedProject) => {
 
         let todoItemIndex = projects[clickedProject].todos.indexOf(todo);
         todoItem.textContent = projects[clickedProject].todos[todoItemIndex].todoTitle;
-        todosDiv.appendChild(todoContainer);
+        todosListDiv.appendChild(todoContainer);
         todoContainer.appendChild(todoItem);
 
         // add expand buttons to each todo item
@@ -132,17 +141,44 @@ const showTodos = (clickedProject) => {
         // adds brackets over delete button on hover
         todoDeleteButtons.forEach((todoDeleteButton) => {
             todoDeleteButton.addEventListener("mouseover", (event) => {
-                event.target.textContent = "[x]";
+                event.target.textContent = "[\u00D7]";
             })
         })
 
         // removes brackets when mouse leaves element
         todoDeleteButtons.forEach((todoDeleteButton) => {
             todoDeleteButton.addEventListener("mouseout", (event) => {
-                event.target.textContent = "x";
+                event.target.textContent = "\u00D7";
             })
         })
+
+        const setFinishedTodo = (todo) => {
+            
+        }
     })
+
+    // creates a finished tasks area and displays any that exist
+    if (projects[clickedProject].finishedTodos.length !== 0) {
+        projects[clickedProject].finishedTodos.forEach((todo) => {
+            const finishedTodoContainer = document.createElement("div");
+            finishedTodoContainer.classList = "finished-todo-container";
+            finishedTodoContainer.id = "finished-todo-container"
+            const todosDiv = document.getElementById("todos");
+            const categoryPara = document.createElement("p");
+            categoryPara.id = "finished-todos-heading";
+            categoryPara.classList = "category finished-todos-heading"
+            const hr = document.createElement("hr");
+            hr.id = "finished-todo-hr"
+            categoryPara.textContent = "Finished Tasks";
+    
+            
+            finishedTodoContainer.textContent = projects[clickedProject].finishedTodos[0].todoTitle;
+    
+            todosDiv.appendChild(categoryPara);
+            todosDiv.appendChild(hr);
+            todosDiv.appendChild(finishedTodoContainer);
+        })
+    }
 }
 
 // display all project objects from projects array
@@ -170,7 +206,7 @@ const showProjects = () => {
         let projectDeleteButton = document.createElement("div");
         projectDeleteButton.classList = "project-delete-button";
         projectDeleteButton.id = projects.indexOf(project);
-        projectDeleteButton.textContent = "x";
+        projectDeleteButton.textContent = "\u00D7";
         projectContainer.appendChild(projectDeleteButton);
 
         // defines behavior when a delete button is clicked
@@ -179,8 +215,8 @@ const showProjects = () => {
             projectDeleteButton.addEventListener("click", (event) => {
                 let targetProjectIndex = Number(event.target.id);
                 if (targetProjectIndex == selectedProject) {
-                    const todosDiv = document.getElementById("todos-list");
-                    todosDiv.innerHTML = "";
+                    const todosListDiv = document.getElementById("todos-list");
+                    todosListDiv.innerHTML = "";
                 }
                 delete projects[targetProjectIndex];
                 event.target.parentElement.remove();
@@ -190,14 +226,14 @@ const showProjects = () => {
         // adds brackets over delete button on hover
         projectDeleteButtons.forEach((projectDeleteButton) => {
             projectDeleteButton.addEventListener("mouseover", (event) => {
-                event.target.textContent = "[x]";
+                event.target.textContent = "[\u00D7]";
             })
         })
 
         // removes brackets when mouse leaves element
         projectDeleteButtons.forEach((projectDeleteButton) => {
             projectDeleteButton.addEventListener("mouseout", (event) => {
-                event.target.textContent = "x";
+                event.target.textContent = "\u00D7";
             })
         })
     })
@@ -311,7 +347,7 @@ const addNewTodoDiv = () => {
         return;
     }
 
-    const todosDiv = document.getElementById("todos");
+    const addTodoFormDiv = document.getElementById("add-todo-form-container");
     const todoTitleInputField = document.createElement("input");
     const todoTitleInputFieldLabel = document.createElement("label");
     const todoDescriptionInputField = document.createElement("input");
@@ -388,7 +424,7 @@ const addNewTodoDiv = () => {
     addTodoButton.textContent = "Add";
     cancelTodoButton.textContent = "Cancel";
 
-    todosDiv.appendChild(addTodoForm);
+    addTodoFormDiv.appendChild(addTodoForm);
     addTodoForm.appendChild(todoTitleInputFieldLabel);
     addTodoForm.appendChild(todoTitleInputField);
     addTodoForm.appendChild(todoDescriptionInputFieldLabel);
@@ -432,6 +468,13 @@ const addNewTodoDiv = () => {
                 newTodoDueDate
             )
         );
+
+        const finishedTodoContainer = document.getElementById("finished-todo-container");
+        finishedTodoContainer.innerHTML = "";
+        const categoryPara = document.getElementById("finished-todos-heading");
+        categoryPara.remove();
+        const hr = document.getElementById("finished-todo-hr");
+        hr.remove();
         showTodos(selectedProject);
         newTodoButtonClicked = false;
         addTodoFormContainer.remove();

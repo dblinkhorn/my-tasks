@@ -107,13 +107,18 @@ hr {
     justify-content: center;
 }
 
-.todo-item {
+.todo-item,
+.finished-todo-container {
     grid-column: 1/2;
     grid-row: 1/2;
     word-wrap: break-word;
     width: 780px;
     max-width: 780px;
     margin-left: 3px;
+}
+
+.finished-todo-container {
+    text-decoration: line-through;
 }
 
 .todo-delete-button,
@@ -142,6 +147,10 @@ hr {
     justify-items: center;
     align-items: center;
     width: 70px;
+}
+
+.finished-todos-heading {
+    margin-top: 40px;
 }
 
 button {
