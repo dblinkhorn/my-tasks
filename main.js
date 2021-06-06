@@ -1,3 +1,5 @@
+// tests
+
 // object factory for creating project instances
 const ProjectFactory = (projectTitle) => {
     return {
