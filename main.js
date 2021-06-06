@@ -73,7 +73,7 @@ const showTodos = (clickedProject) => {
 
         // add expand buttons to each todo item
         let todoExpandButton = document.createElement("div");
-        todoExpandButton.classList = "todo-expand-button";
+        todoExpandButton.classList = "todo-expand-button hover";
         todoExpandButton.id = projects[clickedProject].todos.indexOf(todo);
         todoExpandButton.textContent = "MORE >";
         todoContainer.appendChild(todoExpandButton);
@@ -83,9 +83,13 @@ const showTodos = (clickedProject) => {
         todoExpandButton.addEventListener("click", (event) => {
             todoExpandButton.setAttribute("display", "inline");
             let targetExpandIndex = Number(event.target.id);
+            const todoExpandContainer = document.createElement("div");
             const todoDescriptionValue = document.createElement("div");
             const todoPriorityValue = document.createElement("div");
             const todoDueDateValue = document.createElement("div");
+
+            todoExpandContainer.id = "todo-expand-container";
+            todoExpandContainer.classList = "todo-expand-container";
 
             todoDescriptionValue.id = `todo-description-value-${targetExpandIndex.toString()}`;
             todoDescriptionValue.classList = "todo-description-value";
@@ -97,7 +101,12 @@ const showTodos = (clickedProject) => {
             
             todoDueDateValue.id = `todo-due-date-value-${targetExpandIndex.toString()}`;
             todoDueDateValue.classList = "todo-due-date-value";
-            todoDueDateValue.textContent = `Due date: ${projects[clickedProject].todos[targetExpandIndex].todoDueDate}`;
+            if (projects[clickedProject].todos[targetExpandIndex].todoDueDate === "") {
+                console.log("empty date works");
+                todoDueDateValue.textContent = "Due Date: None";
+            } else {
+                todoDueDateValue.textContent = `Due date: ${projects[clickedProject].todos[targetExpandIndex].todoDueDate}`;
+            }
 
             if (expandButtonClicked) {
                 let todoDescription = document.getElementById(`todo-description-value-${targetExpandIndex.toString()}`);
@@ -111,9 +120,10 @@ const showTodos = (clickedProject) => {
                 return expandButtonClicked = false;
             }
 
-            todoContainer.appendChild(todoDescriptionValue);
-            todoContainer.appendChild(todoPriorityValue);
-            todoContainer.appendChild(todoDueDateValue);
+            todoContainer.appendChild(todoExpandContainer);
+            todoExpandContainer.appendChild(todoDescriptionValue);
+            todoExpandContainer.appendChild(todoPriorityValue);
+            todoExpandContainer.appendChild(todoDueDateValue);
 
             todoExpandButton.textContent = "< LESS";
 
@@ -123,9 +133,9 @@ const showTodos = (clickedProject) => {
 
         // add delete buttons to each todo item
         let todoDeleteButton = document.createElement("div");
-        todoDeleteButton.classList = "todo-delete-button";
+        todoDeleteButton.classList = "todo-delete-button hover";
         todoDeleteButton.id = projects[clickedProject].todos.indexOf(todo);
-        todoDeleteButton.textContent = "x";
+        todoDeleteButton.textContent = "\u00D7";
         todoContainer.appendChild(todoDeleteButton);
 
         // defines behavior when a delete button is clicked
@@ -138,22 +148,17 @@ const showTodos = (clickedProject) => {
             })
         })
 
-        // adds brackets over delete button on hover
-        todoDeleteButtons.forEach((todoDeleteButton) => {
-            todoDeleteButton.addEventListener("mouseover", (event) => {
-                event.target.textContent = "[\u00D7]";
-            })
-        })
-
-        // removes brackets when mouse leaves element
-        todoDeleteButtons.forEach((todoDeleteButton) => {
-            todoDeleteButton.addEventListener("mouseout", (event) => {
-                event.target.textContent = "\u00D7";
-            })
-        })
+        // add delete buttons to each todo item
+        let todoFinishedButton = document.createElement("div");
+        todoFinishedButton.classList = "todo-finished-button hover";
+        todoFinishedButton.id = projects[clickedProject].todos.indexOf(todo);
+        todoFinishedButton.textContent = "O";
+        todoContainer.appendChild(todoFinishedButton);
 
         const setFinishedTodo = (todo) => {
-            
+            let finishedTodo = projects[clickedProject].todos[targetTodoIndex];
+            projects[clickedProject].finishedTodos.push(finishedTodo);
+            delete projects[clickedProject].todos[targetTodoIndex];
         }
     })
 
@@ -204,7 +209,7 @@ const showProjects = () => {
 
         // add delete buttons to each project item
         let projectDeleteButton = document.createElement("div");
-        projectDeleteButton.classList = "project-delete-button";
+        projectDeleteButton.classList = "project-delete-button hover";
         projectDeleteButton.id = projects.indexOf(project);
         projectDeleteButton.textContent = "\u00D7";
         projectContainer.appendChild(projectDeleteButton);
@@ -220,20 +225,6 @@ const showProjects = () => {
                 }
                 delete projects[targetProjectIndex];
                 event.target.parentElement.remove();
-            })
-        })
-
-        // adds brackets over delete button on hover
-        projectDeleteButtons.forEach((projectDeleteButton) => {
-            projectDeleteButton.addEventListener("mouseover", (event) => {
-                event.target.textContent = "[\u00D7]";
-            })
-        })
-
-        // removes brackets when mouse leaves element
-        projectDeleteButtons.forEach((projectDeleteButton) => {
-            projectDeleteButton.addEventListener("mouseout", (event) => {
-                event.target.textContent = "\u00D7";
             })
         })
     })
