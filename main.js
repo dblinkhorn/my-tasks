@@ -46,11 +46,68 @@ const highlightSelectedProject = (selectedProject) => {
     let projectContainers = document.querySelectorAll(".project-container");
     projectContainers.forEach( (container) => {
         container.classList.remove("clicked");
-        console.log(selectedProject.toString());
         if (container.id === selectedProject.toString()) {
             container.classList.add("clicked");
       } return;
     })
+}
+
+// clears any currently displayed finished todos if finished todos exist for project
+const clearFinishedTodos = () => {
+    if (document.getElementById("finished-todo-container")) {
+        const finishedTodoContainer = document.getElementById("finished-todo-container");
+        finishedTodoContainer.remove();
+        // const categoryPara = document.getElementById("finished-todos-heading");
+        // categoryPara.remove();
+        // const hr = document.getElementById("finished-todo-hr");
+        // hr.remove();
+    } return;
+}
+
+// shows finished todos in the DOM
+const showFinishedTodos = (clickedProject) => {
+    if (document.getElementById("finished-todo-container")) {
+        clearFinishedTodos();
+    } else {
+        // creates a finished tasks area and displays any that exist
+        if (projects[clickedProject].finishedTodos.length !== 0) {
+
+            const finishedTodoContainer = document.createElement("div");
+            finishedTodoContainer.classList = "finished-todo-container";
+            finishedTodoContainer.id = "finished-todo-container";
+            const todosDiv = document.getElementById("todos");
+            const categoryPara = document.createElement("p");
+            categoryPara.id = "finished-todos-heading";
+            categoryPara.classList = "category finished-todos-heading";
+            const hr = document.createElement("hr");
+            hr.id = "finished-todo-hr";
+            categoryPara.textContent = "Finished Tasks";
+
+            finishedTodoContainer.appendChild(categoryPara);
+            finishedTodoContainer.appendChild(hr);
+
+            projects[clickedProject].finishedTodos.forEach((todo) => {
+                
+                // let finishedTodoItemIndex = projects[clickedProject].finishedTodos.indexOf(todo);
+                // finishedTodoItem.textContent = projects[clickedProject].finishedTodos[finishedTodoItemIndex].todoTitle;
+                // finishedTodoContainer.appendChild(finishedTodoItem);
+
+                const finishedTodoItem = document.createElement("div");
+                finishedTodoItem.classList = "finished-todo-item";
+                finishedTodoItem.id = "finished-todo-item";
+
+                let finishedTodoItemIndex = projects[clickedProject].finishedTodos.indexOf(todo);
+                finishedTodoItem.textContent = projects[clickedProject].finishedTodos[finishedTodoItemIndex].todoTitle;
+
+                finishedTodoContainer.appendChild(finishedTodoItem);
+            })
+
+            todosDiv.appendChild(finishedTodoContainer);
+
+        } else {
+            return;
+        }
+    }
 }
 
 // display all todos for the selected project
@@ -102,7 +159,6 @@ const showTodos = (clickedProject) => {
             todoDueDateValue.id = `todo-due-date-value-${targetExpandIndex.toString()}`;
             todoDueDateValue.classList = "todo-due-date-value";
             if (projects[clickedProject].todos[targetExpandIndex].todoDueDate === "") {
-                console.log("empty date works");
                 todoDueDateValue.textContent = "Due Date: None";
             } else {
                 todoDueDateValue.textContent = `Due date: ${projects[clickedProject].todos[targetExpandIndex].todoDueDate}`;
@@ -148,42 +204,29 @@ const showTodos = (clickedProject) => {
             })
         })
 
-        // add delete buttons to each todo item
+        // add finished buttons to each todo item
         let todoFinishedButton = document.createElement("div");
         todoFinishedButton.classList = "todo-finished-button hover";
         todoFinishedButton.id = projects[clickedProject].todos.indexOf(todo);
         todoFinishedButton.textContent = "O";
         todoContainer.appendChild(todoFinishedButton);
 
-        const setFinishedTodo = (todo) => {
-            let finishedTodo = projects[clickedProject].todos[targetTodoIndex];
-            projects[clickedProject].finishedTodos.push(finishedTodo);
-            delete projects[clickedProject].todos[targetTodoIndex];
-        }
+        // defines behavior when a finished button is clicked
+        let todoFinishedButtons = document.querySelectorAll(".todo-finished-button");
+        todoFinishedButtons.forEach((todoFinishedButton) => {
+            todoFinishedButton.addEventListener("click", (event) => {
+                let targetTodoIndex = Number(event.target.id);
+                let finishedTodo = projects[clickedProject].todos[targetTodoIndex];
+                projects[clickedProject].finishedTodos.push(finishedTodo);
+                delete projects[clickedProject].todos[targetTodoIndex];
+                event.target.parentElement.remove();
+                showTodos(selectedProject);
+            })
+        })
     })
 
-    // creates a finished tasks area and displays any that exist
-    if (projects[clickedProject].finishedTodos.length !== 0) {
-        projects[clickedProject].finishedTodos.forEach((todo) => {
-            const finishedTodoContainer = document.createElement("div");
-            finishedTodoContainer.classList = "finished-todo-container";
-            finishedTodoContainer.id = "finished-todo-container"
-            const todosDiv = document.getElementById("todos");
-            const categoryPara = document.createElement("p");
-            categoryPara.id = "finished-todos-heading";
-            categoryPara.classList = "category finished-todos-heading"
-            const hr = document.createElement("hr");
-            hr.id = "finished-todo-hr"
-            categoryPara.textContent = "Finished Tasks";
-    
-            
-            finishedTodoContainer.textContent = projects[clickedProject].finishedTodos[0].todoTitle;
-    
-            todosDiv.appendChild(categoryPara);
-            todosDiv.appendChild(hr);
-            todosDiv.appendChild(finishedTodoContainer);
-        })
-    }
+    clearFinishedTodos();
+    showFinishedTodos(selectedProject);
 }
 
 // display all project objects from projects array
@@ -198,6 +241,9 @@ const showProjects = () => {
         projectItem.id = projects.indexOf(project);
         projectContainer.id = projects.indexOf(project);
         projectItem.addEventListener("click", (event) => {
+            if (projectContainer.classList.contains("clicked")) {
+                return;
+            }
             let clickedProject = Number(event.target.id);
             selectedProject = clickedProject;
             highlightSelectedProject(clickedProject);
@@ -339,6 +385,7 @@ const addNewTodoDiv = () => {
     }
 
     const addTodoFormDiv = document.getElementById("add-todo-form-container");
+    addTodoFormDiv.classList.remove("hidden");
     const todoTitleInputField = document.createElement("input");
     const todoTitleInputFieldLabel = document.createElement("label");
     const todoDescriptionInputField = document.createElement("input");
@@ -460,21 +507,17 @@ const addNewTodoDiv = () => {
             )
         );
 
-        const finishedTodoContainer = document.getElementById("finished-todo-container");
-        finishedTodoContainer.innerHTML = "";
-        const categoryPara = document.getElementById("finished-todos-heading");
-        categoryPara.remove();
-        const hr = document.getElementById("finished-todo-hr");
-        hr.remove();
         showTodos(selectedProject);
         newTodoButtonClicked = false;
         addTodoFormContainer.remove();
+        addTodoFormDiv.classList.add("hidden");
     });
 
     // if cancel button is clicked then remove the form elements from the DOM
     cancelTodoButton.addEventListener("click", () => {
         newTodoButtonClicked = false;
         addTodoFormContainer.remove();
+        addTodoFormDiv.classList.add("hidden");
     })
 }
 

@@ -121,7 +121,7 @@ hr {
     margin-left: 6px;
 }
 
-.finished-todo-container {
+.finished-todo-item {
     text-decoration: line-through;
 }
 
@@ -189,7 +189,7 @@ button {
     padding: 6px;
     margin-right: 12px;
     border: 1px solid rgba(0, 0, 0, 0.0);
-    border-radius: 5px;
+    border-radius: 6px;
 }
 
 .project-input {
@@ -203,8 +203,12 @@ button {
     border-radius: 6px;
 }
 
-.add-todo-form {
-    margin-left: 32px;
+.add-todo-form-container {
+    background-color: #43565f;
+    border: 1px solid #43565f;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 20px;
 }
   
 input[type=text] {
@@ -231,7 +235,7 @@ label {
     padding: 4px;
     margin-top: 8px;
     border: 1px solid rgba(0, 0, 0, 0.0);
-    border-radius: 5px;
+    border-radius: 6px;
 }
   
 .new-project-buttons {
@@ -251,7 +255,7 @@ label {
     margin-top: 8px;
     width: 252px;
     border: 1px solid rgba(0, 0, 0, 0.0);
-    border-radius: 5px;
+    border-radius: 6px;
 }
 
 form {
@@ -273,7 +277,11 @@ button:hover {
 
 .clicked,
 .clicked:hover {
-    background-color: #303e45;
+    background-color: #43565f;
+}
+
+.hidden {
+    display: none;
 }
 
 .todo-description-value,
