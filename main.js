@@ -1,17 +1,19 @@
+// object factory for creating project instances
 const ProjectFactory = (projectTitle) => {
     return {
         projectTitle: projectTitle,
-        todos: [],
-        finishedTodos: []
+        tasks: [],
+        finishedtasks: []
     }
 }
 
-const TodoFactory = (todoTitle, todoDescription, todoPriority, todoDueDate) => {
+// object factory for creating tasks which will then be placed into respective projects
+const TaskFactory = (taskTitle, taskDescription, taskPriority, taskDueDate) => {
     return {
-        todoTitle: todoTitle,
-        todoDescription: todoDescription,
-        todoPriority: todoPriority,
-        todoDueDate: todoDueDate
+        taskTitle: taskTitle,
+        taskDescription: taskDescription,
+        taskPriority: taskPriority,
+        taskDueDate: taskDueDate
     }
 }
 
@@ -21,21 +23,13 @@ projects.push(
     ProjectFactory("Random Tasks")
 )
 
-projects[0].todos.push(
-    TodoFactory(
+// creates a default example task on page load
+projects[0].tasks.push(
+    TaskFactory(
         "This is an example task. Delete it and begin creating your own!",
         "This is just an example task. Feel free to delete it!",
         "Low",
-        "No Due Date"
-    )
-)
-
-projects[0].finishedTodos.push(
-    TodoFactory(
-        "this is a test finished task",
-        "this is the description for it",
-        "Medium",
-        "No Due Date"
+        "None"
     )
 )
 
@@ -52,57 +46,53 @@ const highlightSelectedProject = (selectedProject) => {
     })
 }
 
-// clears any currently displayed finished todos if finished todos exist for project
-const clearFinishedTodos = () => {
-    if (document.getElementById("finished-todo-container")) {
-        const finishedTodoContainer = document.getElementById("finished-todo-container");
-        finishedTodoContainer.remove();
-        // const categoryPara = document.getElementById("finished-todos-heading");
+// clears any currently displayed finished tasks if finished tasks exist for project
+const clearFinishedtasks = () => {
+    if (document.getElementById("finished-task-container")) {
+        const finishedtaskContainer = document.getElementById("finished-task-container");
+        finishedtaskContainer.remove();
+        // const categoryPara = document.getElementById("finished-tasks-heading");
         // categoryPara.remove();
-        // const hr = document.getElementById("finished-todo-hr");
+        // const hr = document.getElementById("finished-task-hr");
         // hr.remove();
     } return;
 }
 
-// shows finished todos in the DOM
-const showFinishedTodos = (clickedProject) => {
-    if (document.getElementById("finished-todo-container")) {
-        clearFinishedTodos();
+// shows finished tasks in the DOM
+const showFinishedtasks = (clickedProject) => {
+    if (document.getElementById("finished-task-container")) {
+        clearFinishedtasks();
     } else {
         // creates a finished tasks area and displays any that exist
-        if (projects[clickedProject].finishedTodos.length !== 0) {
+        if (projects[clickedProject].finishedtasks.length !== 0) {
 
-            const finishedTodoContainer = document.createElement("div");
-            finishedTodoContainer.classList = "finished-todo-container";
-            finishedTodoContainer.id = "finished-todo-container";
-            const todosDiv = document.getElementById("todos");
+            const finishedtaskContainer = document.createElement("div");
+            finishedtaskContainer.classList = "finished-task-container";
+            finishedtaskContainer.id = "finished-task-container";
+            const tasksDiv = document.getElementById("tasks");
             const categoryPara = document.createElement("p");
-            categoryPara.id = "finished-todos-heading";
-            categoryPara.classList = "category finished-todos-heading";
+            categoryPara.id = "finished-tasks-heading";
+            categoryPara.classList = "category finished-tasks-heading";
             const hr = document.createElement("hr");
-            hr.id = "finished-todo-hr";
+            hr.id = "finished-task-hr";
             categoryPara.textContent = "Finished Tasks";
 
-            finishedTodoContainer.appendChild(categoryPara);
-            finishedTodoContainer.appendChild(hr);
+            finishedtaskContainer.appendChild(categoryPara);
+            finishedtaskContainer.appendChild(hr);
 
-            projects[clickedProject].finishedTodos.forEach((todo) => {
-                
-                // let finishedTodoItemIndex = projects[clickedProject].finishedTodos.indexOf(todo);
-                // finishedTodoItem.textContent = projects[clickedProject].finishedTodos[finishedTodoItemIndex].todoTitle;
-                // finishedTodoContainer.appendChild(finishedTodoItem);
+            projects[clickedProject].finishedtasks.forEach((task) => {
 
-                const finishedTodoItem = document.createElement("div");
-                finishedTodoItem.classList = "finished-todo-item";
-                finishedTodoItem.id = "finished-todo-item";
+                const finishedtaskItem = document.createElement("div");
+                finishedtaskItem.classList = "finished-task-item";
+                finishedtaskItem.id = "finished-task-item";
 
-                let finishedTodoItemIndex = projects[clickedProject].finishedTodos.indexOf(todo);
-                finishedTodoItem.textContent = projects[clickedProject].finishedTodos[finishedTodoItemIndex].todoTitle;
+                let finishedtaskItemIndex = projects[clickedProject].finishedtasks.indexOf(task);
+                finishedtaskItem.innerHTML = "\&#10004" + ` ${projects[clickedProject].finishedtasks[finishedtaskItemIndex].taskTitle}`;
 
-                finishedTodoContainer.appendChild(finishedTodoItem);
+                finishedtaskContainer.appendChild(finishedtaskItem);
             })
 
-            todosDiv.appendChild(finishedTodoContainer);
+            tasksDiv.appendChild(finishedtaskContainer);
 
         } else {
             return;
@@ -110,123 +100,129 @@ const showFinishedTodos = (clickedProject) => {
     }
 }
 
-// display all todos for the selected project
-const showTodos = (clickedProject) => {
-    const todosListDiv = document.getElementById("todos-list");
-    todosListDiv.textContent = "";
+// display all tasks for the selected project
+const showtasks = (clickedProject) => {
+    const tasksListDiv = document.getElementById("tasks-list");
+    tasksListDiv.textContent = "";
 
-    projects[clickedProject].todos.forEach((todo) => {
-        let todoContainer = document.createElement("div");
-        todoContainer.classList = "todo-container hover pointer";
+    projects[clickedProject].tasks.forEach((task) => {
+        let taskContainer = document.createElement("div");
+        taskContainer.classList = "task-container hover pointer";
 
-        let todoItem = document.createElement("div");
-        todoItem.classList = "todo-item";
-        todoItem.id = projects[clickedProject].todos.indexOf(todo);
+        let taskItem = document.createElement("div");
+        taskItem.classList = "task-item";
+        taskItem.id = projects[clickedProject].tasks.indexOf(task);
 
-        let todoItemIndex = projects[clickedProject].todos.indexOf(todo);
-        todoItem.textContent = projects[clickedProject].todos[todoItemIndex].todoTitle;
-        todosListDiv.appendChild(todoContainer);
-        todoContainer.appendChild(todoItem);
+        let taskItemIndex = projects[clickedProject].tasks.indexOf(task);
+        taskItem.textContent = projects[clickedProject].tasks[taskItemIndex].taskTitle;
+        tasksListDiv.appendChild(taskContainer);
+        taskContainer.appendChild(taskItem);
 
-        // add expand buttons to each todo item
-        let todoExpandButton = document.createElement("div");
-        todoExpandButton.classList = "todo-expand-button hover";
-        todoExpandButton.id = projects[clickedProject].todos.indexOf(todo);
-        todoExpandButton.textContent = "MORE >";
-        todoContainer.appendChild(todoExpandButton);
+        // add expand buttons to each task item
+        let taskExpandButton = document.createElement("div");
+        taskExpandButton.classList = "task-expand-button hover";
+        taskExpandButton.id = projects[clickedProject].tasks.indexOf(task);
+        taskExpandButton.textContent = "MORE >";
+        taskContainer.appendChild(taskExpandButton);
 
         let expandButtonClicked = false;
 
-        todoExpandButton.addEventListener("click", (event) => {
-            todoExpandButton.setAttribute("display", "inline");
+        taskExpandButton.addEventListener("click", (event) => {
+            taskExpandButton.setAttribute("display", "inline");
             let targetExpandIndex = Number(event.target.id);
-            const todoExpandContainer = document.createElement("div");
-            const todoDescriptionValue = document.createElement("div");
-            const todoPriorityValue = document.createElement("div");
-            const todoDueDateValue = document.createElement("div");
+            const taskExpandContainer = document.createElement("div");
+            const taskDescriptionValue = document.createElement("div");
+            const taskPriorityValue = document.createElement("div");
+            const taskDueDateValue = document.createElement("div");
 
-            todoExpandContainer.id = "todo-expand-container";
-            todoExpandContainer.classList = "todo-expand-container";
+            taskExpandContainer.id = "task-expand-container";
+            taskExpandContainer.classList = "task-expand-container";
 
-            todoDescriptionValue.id = `todo-description-value-${targetExpandIndex.toString()}`;
-            todoDescriptionValue.classList = "todo-description-value";
-            todoDescriptionValue.textContent = `Description: ${projects[clickedProject].todos[targetExpandIndex].todoDescription}`;
+            taskDescriptionValue.id = `task-description-value-${targetExpandIndex.toString()}`;
+            taskDescriptionValue.classList = "task-description-value";
+            taskDescriptionValue.innerHTML = `DESCRIPTION: ${projects[clickedProject].tasks[targetExpandIndex].taskDescription}`;
 
-            todoPriorityValue.id = `todo-priority-value-${targetExpandIndex.toString()}`;
-            todoPriorityValue.classList = "todo-priority-value";
-            todoPriorityValue.textContent = `Priority: ${projects[clickedProject].todos[targetExpandIndex].todoPriority}`;
+            taskPriorityValue.id = `task-priority-value-${targetExpandIndex.toString()}`;
+            taskPriorityValue.classList = "task-priority-value";
+            taskPriorityValue.innerHTML = `PRIORITY: ${projects[clickedProject].tasks[targetExpandIndex].taskPriority}`;
             
-            todoDueDateValue.id = `todo-due-date-value-${targetExpandIndex.toString()}`;
-            todoDueDateValue.classList = "todo-due-date-value";
-            if (projects[clickedProject].todos[targetExpandIndex].todoDueDate === "") {
-                todoDueDateValue.textContent = "Due Date: None";
+            taskDueDateValue.id = `task-due-date-value-${targetExpandIndex.toString()}`;
+            taskDueDateValue.classList = "task-due-date-value";
+            if (projects[clickedProject].tasks[targetExpandIndex].taskDueDate === "") {
+                taskDueDateValue.innerHTML = "DUE DATE: None";
             } else {
-                todoDueDateValue.textContent = `Due date: ${projects[clickedProject].todos[targetExpandIndex].todoDueDate}`;
+                taskDueDateValue.innerHTML = `DUE DATE: ${projects[clickedProject].tasks[targetExpandIndex].taskDueDate}`;
             }
 
             if (expandButtonClicked) {
-                let todoDescription = document.getElementById(`todo-description-value-${targetExpandIndex.toString()}`);
-                let todoPriority = document.getElementById(`todo-priority-value-${targetExpandIndex.toString()}`);
-                let todoDueDate = document.getElementById(`todo-due-date-value-${targetExpandIndex.toString()}`);
-                todoDescription.remove();
-                todoPriority.remove();
-                todoDueDate.remove();
-                todoExpandButton.textContent = "MORE >";
-                todoContainer.classList.remove("clicked");
+                let taskDescription = document.getElementById(`task-description-value-${targetExpandIndex.toString()}`);
+                let taskPriority = document.getElementById(`task-priority-value-${targetExpandIndex.toString()}`);
+                let taskDueDate = document.getElementById(`task-due-date-value-${targetExpandIndex.toString()}`);
+                taskDescription.remove();
+                taskPriority.remove();
+                taskDueDate.remove();
+                taskExpandButton.textContent = "MORE >";
+                taskContainer.classList.remove("clicked");
                 return expandButtonClicked = false;
             }
 
-            todoContainer.appendChild(todoExpandContainer);
-            todoExpandContainer.appendChild(todoDescriptionValue);
-            todoExpandContainer.appendChild(todoPriorityValue);
-            todoExpandContainer.appendChild(todoDueDateValue);
+            taskContainer.appendChild(taskExpandContainer);
+            taskExpandContainer.appendChild(taskDescriptionValue);
+            taskExpandContainer.appendChild(taskPriorityValue);
+            taskExpandContainer.appendChild(taskDueDateValue);
 
-            todoExpandButton.textContent = "< LESS";
+            taskExpandButton.textContent = "< LESS";
 
             expandButtonClicked = true;
-            todoContainer.classList.add("clicked");
+            taskContainer.classList.add("clicked");
         })
 
-        // add delete buttons to each todo item
-        let todoDeleteButton = document.createElement("div");
-        todoDeleteButton.classList = "todo-delete-button hover";
-        todoDeleteButton.id = projects[clickedProject].todos.indexOf(todo);
-        todoDeleteButton.textContent = "\u00D7";
-        todoContainer.appendChild(todoDeleteButton);
+        // add delete buttons to each task item
+        let taskDeleteButton = document.createElement("div");
+        taskDeleteButton.classList = "task-delete-button hover";
+        taskDeleteButton.id = projects[clickedProject].tasks.indexOf(task);
+        taskDeleteButton.textContent = "\u00D7";
+        taskContainer.appendChild(taskDeleteButton);
 
         // defines behavior when a delete button is clicked
-        let todoDeleteButtons = document.querySelectorAll(".todo-delete-button");
-        todoDeleteButtons.forEach((todoDeleteButton) => {
-            todoDeleteButton.addEventListener("click", (event) => {
-                let targetTodoIndex = Number(event.target.id);
-                delete projects[clickedProject].todos[targetTodoIndex];
+        let taskDeleteButtons = document.querySelectorAll(".task-delete-button");
+        taskDeleteButtons.forEach((taskDeleteButton) => {
+            taskDeleteButton.addEventListener("click", (event) => {
+                let targettaskIndex = Number(event.target.id);
+                delete projects[clickedProject].tasks[targettaskIndex];
                 event.target.parentElement.remove();
             })
         })
 
-        // add finished buttons to each todo item
-        let todoFinishedButton = document.createElement("div");
-        todoFinishedButton.classList = "todo-finished-button hover";
-        todoFinishedButton.id = projects[clickedProject].todos.indexOf(todo);
-        todoFinishedButton.textContent = "O";
-        todoContainer.appendChild(todoFinishedButton);
+        // add finished buttons to each task item
+        let taskFinishedButton = document.createElement("div");
+        taskFinishedButton.classList = "task-finished-button hover";
+        taskFinishedButton.id = projects[clickedProject].tasks.indexOf(task);
+        taskFinishedButton.innerHTML = "&#10061";
+        taskContainer.appendChild(taskFinishedButton);
 
         // defines behavior when a finished button is clicked
-        let todoFinishedButtons = document.querySelectorAll(".todo-finished-button");
-        todoFinishedButtons.forEach((todoFinishedButton) => {
-            todoFinishedButton.addEventListener("click", (event) => {
-                let targetTodoIndex = Number(event.target.id);
-                let finishedTodo = projects[clickedProject].todos[targetTodoIndex];
-                projects[clickedProject].finishedTodos.push(finishedTodo);
-                delete projects[clickedProject].todos[targetTodoIndex];
+        let taskFinishedButtons = document.querySelectorAll(".task-finished-button");
+        taskFinishedButtons.forEach((taskFinishedButton) => {
+            taskFinishedButton.addEventListener("click", (event) => {
+                let targettaskIndex = Number(event.target.id);
+                let finishedtask = projects[clickedProject].tasks[targettaskIndex];
+                projects[clickedProject].finishedtasks.push(finishedtask);
+                delete projects[clickedProject].tasks[targettaskIndex];
                 event.target.parentElement.remove();
-                showTodos(selectedProject);
+                showtasks(selectedProject);
+            })
+            taskFinishedButton.addEventListener("mouseover", () => {
+                taskFinishedButton.innerHTML = "\&#10004";
+            })
+            taskFinishedButton.addEventListener("mouseout", () => {
+                taskFinishedButton.innerHTML = "&#10061";
             })
         })
     })
 
-    clearFinishedTodos();
-    showFinishedTodos(selectedProject);
+    clearFinishedtasks();
+    showFinishedtasks(selectedProject);
 }
 
 // display all project objects from projects array
@@ -247,7 +243,7 @@ const showProjects = () => {
             let clickedProject = Number(event.target.id);
             selectedProject = clickedProject;
             highlightSelectedProject(clickedProject);
-            showTodos(clickedProject);
+            showtasks(clickedProject);
         })
         projectItem.textContent = project.projectTitle;
         projectsDiv.appendChild(projectContainer);
@@ -266,11 +262,12 @@ const showProjects = () => {
             projectDeleteButton.addEventListener("click", (event) => {
                 let targetProjectIndex = Number(event.target.id);
                 if (targetProjectIndex == selectedProject) {
-                    const todosListDiv = document.getElementById("todos-list");
-                    todosListDiv.innerHTML = "";
+                    const tasksListDiv = document.getElementById("tasks-list");
+                    tasksListDiv.innerHTML = "";
                 }
                 delete projects[targetProjectIndex];
                 event.target.parentElement.remove();
+                clearFinishedtasks();
             })
         })
     })
@@ -343,7 +340,7 @@ const addNewProjectDiv = () => {
         let newProject = Number(projects.indexOf(newProjectInstance));
         selectedProject = newProject;
         highlightSelectedProject(newProject);
-        showTodos(selectedProject);
+        showtasks(selectedProject);
         newProjectButtonClicked = false;
     });
 
@@ -364,166 +361,166 @@ let checkIfAllEmptyProjects = () => {
     }
 }
 
-const addNewTodoButton = document.getElementById("add-new-todo");
+const addNewtaskButton = document.getElementById("add-new-task");
 
 // controls what happens when add task button is clicked depending on
 // if there are no projects
-addNewTodoButton.addEventListener("click", () => {
+addNewtaskButton.addEventListener("click", () => {
     let checkProjects = checkIfAllEmptyProjects();
     if (checkProjects === undefined) {
         alert("You must create a project before adding tasks.");
         return;
-    } addNewTodoDiv();
+    } addNewtaskDiv();
 })
 
-let newTodoButtonClicked = false;
+let newtaskButtonClicked = false;
 
-// displays add todo form and controls logic
-const addNewTodoDiv = () => {
-    if (newTodoButtonClicked) {
+// displays add task form and controls logic
+const addNewtaskDiv = () => {
+    if (newtaskButtonClicked) {
         return;
     }
 
-    const addTodoFormDiv = document.getElementById("add-todo-form-container");
-    addTodoFormDiv.classList.remove("hidden");
-    const todoTitleInputField = document.createElement("input");
-    const todoTitleInputFieldLabel = document.createElement("label");
-    const todoDescriptionInputField = document.createElement("input");
-    const todoDescriptionInputFieldLabel = document.createElement("label");
-    const todoPrioritySelect = document.createElement("select");
-    const todoPrioritySelectLabel = document.createElement("label");
-        const todoPriorityHigh = document.createElement("option");
-        const todoPriorityMedium = document.createElement("option");
-        const todoPriorityLow = document.createElement("option");
-    const todoDueDateInputField = document.createElement("input");
-    const todoDueDateInputFieldLabel = document.createElement("label");
-    const todoButtonsDiv = document.createElement("div");
-    const addTodoButton = document.createElement("button");
-    const cancelTodoButton = document.createElement("button");
-    const addTodoForm = document.createElement("form");
+    const addtaskFormDiv = document.getElementById("add-task-form-container");
+    addtaskFormDiv.classList.remove("hidden");
+    const taskTitleInputField = document.createElement("input");
+    const taskTitleInputFieldLabel = document.createElement("label");
+    const taskDescriptionInputField = document.createElement("input");
+    const taskDescriptionInputFieldLabel = document.createElement("label");
+    const taskPrioritySelect = document.createElement("select");
+    const taskPrioritySelectLabel = document.createElement("label");
+        const taskPriorityHigh = document.createElement("option");
+        const taskPriorityMedium = document.createElement("option");
+        const taskPriorityLow = document.createElement("option");
+    const taskDueDateInputField = document.createElement("input");
+    const taskDueDateInputFieldLabel = document.createElement("label");
+    const taskButtonsDiv = document.createElement("div");
+    const addtaskButton = document.createElement("button");
+    const canceltaskButton = document.createElement("button");
+    const addtaskForm = document.createElement("form");
 
-    todoTitleInputFieldLabel.setAttribute("for", "new-todo-title");
-    todoTitleInputFieldLabel.textContent = "Task title:";
+    taskTitleInputFieldLabel.setAttribute("for", "new-task-title");
+    taskTitleInputFieldLabel.textContent = "Task title:";
 
-    todoTitleInputField.type = "text";
-    todoTitleInputField.id = "new-todo-title";
-    todoTitleInputField.name = "new-todo-title";
-    todoTitleInputField.required = true;
-    todoTitleInputField.classList = "todo-title-input";
-    todoTitleInputField.setAttribute("maxlength", 120);
-    todoTitleInputField.setAttribute("placeholder", "Enter the task to be completed");
+    taskTitleInputField.type = "text";
+    taskTitleInputField.id = "new-task-title";
+    taskTitleInputField.name = "new-task-title";
+    taskTitleInputField.required = true;
+    taskTitleInputField.classList = "task-title-input";
+    taskTitleInputField.setAttribute("maxlength", 120);
+    taskTitleInputField.setAttribute("placeholder", "Enter the task to be completed");
 
-    todoDescriptionInputFieldLabel.setAttribute("for", "new-todo-description");
-    todoDescriptionInputFieldLabel.textContent = "Task description:";
+    taskDescriptionInputFieldLabel.setAttribute("for", "new-task-description");
+    taskDescriptionInputFieldLabel.textContent = "Task description:";
 
-    todoDescriptionInputField.type = "text";
-    todoDescriptionInputField.id = "new-todo-description";
-    todoDescriptionInputField.name = "new-todo-description";
-    todoDescriptionInputField.required = true;
-    todoDescriptionInputField.classList = "todo-description-input";
-    todoDescriptionInputField.setAttribute("maxlength", 120);
-    todoDescriptionInputField.setAttribute("placeholder", "Enter a description of the task");
+    taskDescriptionInputField.type = "text";
+    taskDescriptionInputField.id = "new-task-description";
+    taskDescriptionInputField.name = "new-task-description";
+    taskDescriptionInputField.required = true;
+    taskDescriptionInputField.classList = "task-description-input";
+    taskDescriptionInputField.setAttribute("maxlength", 120);
+    taskDescriptionInputField.setAttribute("placeholder", "Enter a description of the task");
 
-    todoPrioritySelectLabel.setAttribute("for", "new-todo-priority");
-    todoPrioritySelectLabel.textContent = "Priority level:"
+    taskPrioritySelectLabel.setAttribute("for", "new-task-priority");
+    taskPrioritySelectLabel.textContent = "Priority level:"
 
-    todoPrioritySelect.type = "select";
-    todoPrioritySelect.id = "new-todo-priority";
-    todoPrioritySelect.name = "new-todo-priority";
-    todoPrioritySelect.required = true;
-    todoPrioritySelect.classList = "todo-priority-select";
-    todoPrioritySelect.name = "todo-priority"
+    taskPrioritySelect.type = "select";
+    taskPrioritySelect.id = "new-task-priority";
+    taskPrioritySelect.name = "new-task-priority";
+    taskPrioritySelect.required = true;
+    taskPrioritySelect.classList = "task-priority-select";
+    taskPrioritySelect.name = "task-priority"
 
-    todoPriorityHigh.value = "High";
-    todoPriorityHigh.textContent = "High";
-    todoPriorityMedium.value = "Medium";
-    todoPriorityMedium.textContent = "Medium";
-    todoPriorityLow.value = "Low";
-    todoPriorityLow.textContent = "Low";
+    taskPriorityHigh.value = "High";
+    taskPriorityHigh.textContent = "High";
+    taskPriorityMedium.value = "Medium";
+    taskPriorityMedium.textContent = "Medium";
+    taskPriorityLow.value = "Low";
+    taskPriorityLow.textContent = "Low";
 
-    todoDueDateInputFieldLabel.setAttribute("for", "new-todo-due-date");
-    todoDueDateInputFieldLabel.textContent = "Due date:";
+    taskDueDateInputFieldLabel.setAttribute("for", "new-task-due-date");
+    taskDueDateInputFieldLabel.textContent = "Due date:";
 
-    todoDueDateInputField.type = "date";
-    todoDueDateInputField.id = "new-todo-due-date";
-    todoDueDateInputField.name = "new-todo-due-date";
-    todoDueDateInputField.classList = "todo-due-date-input";
+    taskDueDateInputField.type = "date";
+    taskDueDateInputField.id = "new-task-due-date";
+    taskDueDateInputField.name = "new-task-due-date";
+    taskDueDateInputField.classList = "task-due-date-input";
 
-    todoButtonsDiv.classList = "new-todo-buttons";
+    taskButtonsDiv.classList = "new-task-buttons";
 
-    addTodoForm.id = "add-todo-form";
-    addTodoForm.classList = "add-todo-form";
+    addtaskForm.id = "add-task-form";
+    addtaskForm.classList = "add-task-form";
 
-    addTodoButton.type = "submit";
-    addTodoButton.value = "Add";
+    addtaskButton.type = "submit";
+    addtaskButton.value = "Add";
 
-    cancelTodoButton.value = "Cancel";
+    canceltaskButton.value = "Cancel";
 
-    addTodoButton.textContent = "Add";
-    cancelTodoButton.textContent = "Cancel";
+    addtaskButton.textContent = "Add";
+    canceltaskButton.textContent = "Cancel";
 
-    addTodoFormDiv.appendChild(addTodoForm);
-    addTodoForm.appendChild(todoTitleInputFieldLabel);
-    addTodoForm.appendChild(todoTitleInputField);
-    addTodoForm.appendChild(todoDescriptionInputFieldLabel);
-    addTodoForm.appendChild(todoDescriptionInputField);
-    addTodoForm.appendChild(todoPrioritySelectLabel);
-    addTodoForm.appendChild(todoPrioritySelect);
-    todoPrioritySelect.appendChild(todoPriorityHigh);
-    todoPrioritySelect.appendChild(todoPriorityMedium);
-    todoPrioritySelect.appendChild(todoPriorityLow);
-    addTodoForm.appendChild(todoDueDateInputFieldLabel);
-    addTodoForm.appendChild(todoDueDateInputField);
-    addTodoForm.appendChild(todoButtonsDiv);
-    todoButtonsDiv.appendChild(addTodoButton);
-    todoButtonsDiv.appendChild(cancelTodoButton);
-    todoTitleInputField.focus();
+    addtaskFormDiv.appendChild(addtaskForm);
+    addtaskForm.appendChild(taskTitleInputFieldLabel);
+    addtaskForm.appendChild(taskTitleInputField);
+    addtaskForm.appendChild(taskDescriptionInputFieldLabel);
+    addtaskForm.appendChild(taskDescriptionInputField);
+    addtaskForm.appendChild(taskPrioritySelectLabel);
+    addtaskForm.appendChild(taskPrioritySelect);
+    taskPrioritySelect.appendChild(taskPriorityHigh);
+    taskPrioritySelect.appendChild(taskPriorityMedium);
+    taskPrioritySelect.appendChild(taskPriorityLow);
+    addtaskForm.appendChild(taskDueDateInputFieldLabel);
+    addtaskForm.appendChild(taskDueDateInputField);
+    addtaskForm.appendChild(taskButtonsDiv);
+    taskButtonsDiv.appendChild(addtaskButton);
+    taskButtonsDiv.appendChild(canceltaskButton);
+    taskTitleInputField.focus();
 
-    newTodoButtonClicked = true;
+    newtaskButtonClicked = true;
 
-    let addTodoButtonClicked = false;
+    let addtaskButtonClicked = false;
 
-    let addTodoFormContainer = document.getElementById("add-todo-form");
+    let addtaskFormContainer = document.getElementById("add-task-form");
 
-    // when submit action is clicked then add the new todo to the todos array
+    // when submit action is clicked then add the new task to the tasks array
     // of the currently clicked project & remove the form elements then
-    // re-display the todos array in the todos div
-    addTodoForm.addEventListener("submit", function(e) {
-        if (addTodoButtonClicked) {
+    // re-display the tasks array in the tasks div
+    addtaskForm.addEventListener("submit", function(e) {
+        if (addtaskButtonClicked) {
             return;
         }
         e.preventDefault();
-        addTodoButtonClicked = true;
-        let newTodoTitle = todoTitleInputField.value;
-        let newTodoDescription = todoDescriptionInputField.value;
-        let newTodoPriority = todoPrioritySelect.value;
-        let newTodoDueDate = todoDueDateInputField.value;
-        projects[selectedProject].todos.push(
-            TodoFactory(
-                newTodoTitle,
-                newTodoDescription,
-                newTodoPriority,
-                newTodoDueDate
+        addtaskButtonClicked = true;
+        let newtaskTitle = taskTitleInputField.value;
+        let newtaskDescription = taskDescriptionInputField.value;
+        let newtaskPriority = taskPrioritySelect.value;
+        let newtaskDueDate = taskDueDateInputField.value;
+        projects[selectedProject].tasks.push(
+            TaskFactory(
+                newtaskTitle,
+                newtaskDescription,
+                newtaskPriority,
+                newtaskDueDate
             )
         );
 
-        showTodos(selectedProject);
-        newTodoButtonClicked = false;
-        addTodoFormContainer.remove();
-        addTodoFormDiv.classList.add("hidden");
+        showtasks(selectedProject);
+        newtaskButtonClicked = false;
+        addtaskFormContainer.remove();
+        addtaskFormDiv.classList.add("hidden");
     });
 
     // if cancel button is clicked then remove the form elements from the DOM
-    cancelTodoButton.addEventListener("click", () => {
-        newTodoButtonClicked = false;
-        addTodoFormContainer.remove();
-        addTodoFormDiv.classList.add("hidden");
+    canceltaskButton.addEventListener("click", () => {
+        newtaskButtonClicked = false;
+        addtaskFormContainer.remove();
+        addtaskFormDiv.classList.add("hidden");
     })
 }
 
-// display projects and todos on page load
+// display projects and tasks on page load
 showProjects();
-showTodos(selectedProject);
+showtasks(selectedProject);
 
 // highlight default "Random Tasks" project on page load
 const randomTasksProject = document.getElementById("0").classList.add("clicked");
