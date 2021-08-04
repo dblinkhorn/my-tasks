@@ -1,11 +1,9 @@
-// tests
-
 // object factory for creating project instances
 const ProjectFactory = (projectTitle) => {
     return {
         projectTitle: projectTitle,
         tasks: [],
-        finishedtasks: []
+        finishedTasks: []
     }
 }
 
@@ -19,22 +17,31 @@ const TaskFactory = (taskTitle, taskDescription, taskPriority, taskDueDate) => {
     }
 }
 
-projects = [];
+let projects = JSON.parse(localStorage.getItem("projects"));
 
-projects.push(
-    ProjectFactory("Random Tasks")
-)
+if (!projects) {
+    projects = [];
 
-// creates a default example task on page load
-projects[0].tasks.push(
-    TaskFactory(
-        "This is an example task. Delete it and begin creating your own!",
-        "This is just an example task. Feel free to delete it!",
-        "Low",
-        "None"
+    projects.push(
+        ProjectFactory("Random Tasks")
     )
-)
 
+    // creates a default example task on page load
+    projects[0].tasks.push(
+        TaskFactory(
+            "This is an example task. Delete it and begin creating your own!",
+            "This is just an example task. Feel free to delete it!",
+            "Low",
+            "None"
+        )
+    )
+
+    localStorage.setItem("projects", JSON.stringify(projects));
+}
+
+projects = JSON.parse(localStorage.getItem("projects"));
+
+// stores index of last project user clicked
 let selectedProject = 0;
 
 // highlights the project clicked by user
@@ -48,29 +55,32 @@ const highlightSelectedProject = (selectedProject) => {
     })
 }
 
+for (project of projects) {
+    if (project) {
+        selectedProject = Number(projects.indexOf(project));
+        break;
+    }
+}
+
 // clears any currently displayed finished tasks if finished tasks exist for project
-const clearFinishedtasks = () => {
+const clearFinishedTasks = () => {
     if (document.getElementById("finished-task-container")) {
-        const finishedtaskContainer = document.getElementById("finished-task-container");
-        finishedtaskContainer.remove();
-        // const categoryPara = document.getElementById("finished-tasks-heading");
-        // categoryPara.remove();
-        // const hr = document.getElementById("finished-task-hr");
-        // hr.remove();
+        const finishedTaskContainer = document.getElementById("finished-task-container");
+        finishedTaskContainer.remove();
     } return;
 }
 
 // shows finished tasks in the DOM
-const showFinishedtasks = (clickedProject) => {
+const showFinishedTasks = (clickedProject) => {
     if (document.getElementById("finished-task-container")) {
-        clearFinishedtasks();
+        clearFinishedTasks();
     } else {
         // creates a finished tasks area and displays any that exist
-        if (projects[clickedProject].finishedtasks.length !== 0) {
+        if (projects[clickedProject].finishedTasks.length !== 0) {
 
-            const finishedtaskContainer = document.createElement("div");
-            finishedtaskContainer.classList = "finished-task-container";
-            finishedtaskContainer.id = "finished-task-container";
+            const finishedTaskContainer = document.createElement("div");
+            finishedTaskContainer.classList = "finished-task-container";
+            finishedTaskContainer.id = "finished-task-container";
             const tasksDiv = document.getElementById("tasks");
             const categoryPara = document.createElement("p");
             categoryPara.id = "finished-tasks-heading";
@@ -79,22 +89,28 @@ const showFinishedtasks = (clickedProject) => {
             hr.id = "finished-task-hr";
             categoryPara.textContent = "Finished Tasks";
 
-            finishedtaskContainer.appendChild(categoryPara);
-            finishedtaskContainer.appendChild(hr);
+            finishedTaskContainer.appendChild(categoryPara);
+            finishedTaskContainer.appendChild(hr);
 
-            projects[clickedProject].finishedtasks.forEach((task) => {
+            projects[clickedProject].finishedTasks.forEach((task) => {
 
-                const finishedtaskItem = document.createElement("div");
-                finishedtaskItem.classList = "finished-task-item";
-                finishedtaskItem.id = "finished-task-item";
+                const finishedTaskItem = document.createElement("div");
+                finishedTaskItem.classList = "finished-task-item";
+                finishedTaskItem.id = "finished-task-item";
 
-                let finishedtaskItemIndex = projects[clickedProject].finishedtasks.indexOf(task);
-                finishedtaskItem.innerHTML = "\&#10004" + ` ${projects[clickedProject].finishedtasks[finishedtaskItemIndex].taskTitle}`;
+                let finishedTaskItemIndex = projects[clickedProject].finishedTasks.indexOf(task);
+                try {
+                    finishedTaskItem.innerHTML = "\&#10004" +
+                    ` ${projects[clickedProject].finishedTasks[finishedTaskItemIndex].taskTitle}`;
+                }
 
-                finishedtaskContainer.appendChild(finishedtaskItem);
+                catch (error) {
+                    return;
+                }
+                finishedTaskContainer.appendChild(finishedTaskItem);
             })
 
-            tasksDiv.appendChild(finishedtaskContainer);
+            tasksDiv.appendChild(finishedTaskContainer);
 
         } else {
             return;
@@ -103,11 +119,12 @@ const showFinishedtasks = (clickedProject) => {
 }
 
 // display all tasks for the selected project
-const showtasks = (clickedProject) => {
-    const tasksListDiv = document.getElementById("tasks-list");
-    tasksListDiv.textContent = "";
+const showTasks = (clickedProject) => {
+    const taskListDiv = document.getElementById("tasks-list");
+    taskListDiv.textContent = "";
 
     projects[clickedProject].tasks.forEach((task) => {
+
         let taskContainer = document.createElement("div");
         taskContainer.classList = "task-container hover pointer";
 
@@ -116,8 +133,14 @@ const showtasks = (clickedProject) => {
         taskItem.id = projects[clickedProject].tasks.indexOf(task);
 
         let taskItemIndex = projects[clickedProject].tasks.indexOf(task);
-        taskItem.textContent = projects[clickedProject].tasks[taskItemIndex].taskTitle;
-        tasksListDiv.appendChild(taskContainer);
+        try {
+            taskItem.textContent = projects[clickedProject].tasks[taskItemIndex].taskTitle;
+        }
+
+        catch (e) {
+            return;
+        }
+        taskListDiv.appendChild(taskContainer);
         taskContainer.appendChild(taskItem);
 
         // add expand buttons to each task item
@@ -190,8 +213,9 @@ const showtasks = (clickedProject) => {
         let taskDeleteButtons = document.querySelectorAll(".task-delete-button");
         taskDeleteButtons.forEach((taskDeleteButton) => {
             taskDeleteButton.addEventListener("click", (event) => {
-                let targettaskIndex = Number(event.target.id);
-                delete projects[clickedProject].tasks[targettaskIndex];
+                let targetTaskIndex = Number(event.target.id);
+                delete projects[clickedProject].tasks[targetTaskIndex];
+                localStorage.setItem("projects", JSON.stringify(projects));
                 event.target.parentElement.remove();
             })
         })
@@ -207,24 +231,22 @@ const showtasks = (clickedProject) => {
         let taskFinishedButtons = document.querySelectorAll(".task-finished-button");
         taskFinishedButtons.forEach((taskFinishedButton) => {
             taskFinishedButton.addEventListener("click", (event) => {
-                let targettaskIndex = Number(event.target.id);
-                let finishedtask = projects[clickedProject].tasks[targettaskIndex];
-                projects[clickedProject].finishedtasks.push(finishedtask);
-                delete projects[clickedProject].tasks[targettaskIndex];
-                event.target.parentElement.remove();
-                showtasks(selectedProject);
-            })
-            taskFinishedButton.addEventListener("mouseover", () => {
+                let targetTaskIndex = Number(event.target.id);
+                let finishedTask = projects[clickedProject].tasks[targetTaskIndex];
+                projects[clickedProject].finishedTasks.push(finishedTask);
+                delete projects[clickedProject].tasks[targetTaskIndex];
+                localStorage.setItem("projects", JSON.stringify(projects));
                 taskFinishedButton.innerHTML = "\&#10004";
-            })
-            taskFinishedButton.addEventListener("mouseout", () => {
-                taskFinishedButton.innerHTML = "&#10061";
+                setTimeout(() => {
+                    event.target.parentElement.remove();
+                    showTasks(selectedProject);
+                }, 250);
             })
         })
     })
 
-    clearFinishedtasks();
-    showFinishedtasks(selectedProject);
+    clearFinishedTasks();
+    showFinishedTasks(selectedProject);
 }
 
 // display all project objects from projects array
@@ -245,9 +267,15 @@ const showProjects = () => {
             let clickedProject = Number(event.target.id);
             selectedProject = clickedProject;
             highlightSelectedProject(clickedProject);
-            showtasks(clickedProject);
+            showTasks(clickedProject);
         })
-        projectItem.textContent = project.projectTitle;
+        try {
+            projectItem.textContent = project.projectTitle;
+        }
+
+        catch (e) {
+            return;
+        }
         projectsDiv.appendChild(projectContainer);
         projectContainer.appendChild(projectItem);
 
@@ -264,12 +292,13 @@ const showProjects = () => {
             projectDeleteButton.addEventListener("click", (event) => {
                 let targetProjectIndex = Number(event.target.id);
                 if (targetProjectIndex == selectedProject) {
-                    const tasksListDiv = document.getElementById("tasks-list");
-                    tasksListDiv.innerHTML = "";
+                    const taskListDiv = document.getElementById("tasks-list");
+                    taskListDiv.innerHTML = "";
                 }
                 delete projects[targetProjectIndex];
+                localStorage.setItem("projects", JSON.stringify(projects));
                 event.target.parentElement.remove();
-                clearFinishedtasks();
+                clearFinishedTasks();
             })
         })
     })
@@ -327,22 +356,23 @@ const addNewProjectDiv = () => {
 
     // when submit action is clicked then add the new project to the projects array &
     // remove the form elements, re-display the projects array in the projects div
-    addProjectForm.addEventListener("submit", function(e) {
+    addProjectForm.addEventListener("submit", function(event) {
         if (addProjectButtonClicked) {
             return;
         }
-        e.preventDefault();
+        event.preventDefault();
         addProjectButtonClicked = true;
         let newProjectName = projectInputField.value;
         let newProjectInstance = ProjectFactory(newProjectName);
         projects.push(newProjectInstance);
+        localStorage.setItem("projects", JSON.stringify(projects));
         projectInputField.remove();
         projectButtonsDiv.remove();
         showProjects();
         let newProject = Number(projects.indexOf(newProjectInstance));
         selectedProject = newProject;
         highlightSelectedProject(newProject);
-        showtasks(selectedProject);
+        showTasks(selectedProject);
         newProjectButtonClicked = false;
     });
 
@@ -363,28 +393,28 @@ let checkIfAllEmptyProjects = () => {
     }
 }
 
-const addNewtaskButton = document.getElementById("add-new-task");
+const addNewTaskButton = document.getElementById("add-new-task");
 
 // controls what happens when add task button is clicked depending on
 // if there are no projects
-addNewtaskButton.addEventListener("click", () => {
+addNewTaskButton.addEventListener("click", () => {
     let checkProjects = checkIfAllEmptyProjects();
     if (checkProjects === undefined) {
         alert("You must create a project before adding tasks.");
         return;
-    } addNewtaskDiv();
+    } addNewTaskDiv();
 })
 
-let newtaskButtonClicked = false;
+let newTaskButtonClicked = false;
 
 // displays add task form and controls logic
-const addNewtaskDiv = () => {
-    if (newtaskButtonClicked) {
+const addNewTaskDiv = () => {
+    if (newTaskButtonClicked) {
         return;
     }
 
-    const addtaskFormDiv = document.getElementById("add-task-form-container");
-    addtaskFormDiv.classList.remove("hidden");
+    const addTaskFormDiv = document.getElementById("add-task-form-container");
+    addTaskFormDiv.classList.remove("hidden");
     const taskTitleInputField = document.createElement("input");
     const taskTitleInputFieldLabel = document.createElement("label");
     const taskDescriptionInputField = document.createElement("input");
@@ -397,9 +427,9 @@ const addNewtaskDiv = () => {
     const taskDueDateInputField = document.createElement("input");
     const taskDueDateInputFieldLabel = document.createElement("label");
     const taskButtonsDiv = document.createElement("div");
-    const addtaskButton = document.createElement("button");
-    const canceltaskButton = document.createElement("button");
-    const addtaskForm = document.createElement("form");
+    const addTaskButton = document.createElement("button");
+    const cancelTaskButton = document.createElement("button");
+    const addTaskForm = document.createElement("form");
 
     taskTitleInputFieldLabel.setAttribute("for", "new-task-title");
     taskTitleInputFieldLabel.textContent = "Task title:";
@@ -450,79 +480,88 @@ const addNewtaskDiv = () => {
 
     taskButtonsDiv.classList = "new-task-buttons";
 
-    addtaskForm.id = "add-task-form";
-    addtaskForm.classList = "add-task-form";
+    addTaskForm.id = "add-task-form";
+    addTaskForm.classList = "add-task-form";
 
-    addtaskButton.type = "submit";
-    addtaskButton.value = "Add";
+    addTaskButton.type = "submit";
+    addTaskButton.value = "Add";
 
-    canceltaskButton.value = "Cancel";
+    cancelTaskButton.value = "Cancel";
 
-    addtaskButton.textContent = "Add";
-    canceltaskButton.textContent = "Cancel";
+    addTaskButton.textContent = "Add";
+    cancelTaskButton.textContent = "Cancel";
 
-    addtaskFormDiv.appendChild(addtaskForm);
-    addtaskForm.appendChild(taskTitleInputFieldLabel);
-    addtaskForm.appendChild(taskTitleInputField);
-    addtaskForm.appendChild(taskDescriptionInputFieldLabel);
-    addtaskForm.appendChild(taskDescriptionInputField);
-    addtaskForm.appendChild(taskPrioritySelectLabel);
-    addtaskForm.appendChild(taskPrioritySelect);
+    addTaskFormDiv.appendChild(addTaskForm);
+    addTaskForm.appendChild(taskTitleInputFieldLabel);
+    addTaskForm.appendChild(taskTitleInputField);
+    addTaskForm.appendChild(taskDescriptionInputFieldLabel);
+    addTaskForm.appendChild(taskDescriptionInputField);
+    addTaskForm.appendChild(taskPrioritySelectLabel);
+    addTaskForm.appendChild(taskPrioritySelect);
     taskPrioritySelect.appendChild(taskPriorityHigh);
     taskPrioritySelect.appendChild(taskPriorityMedium);
     taskPrioritySelect.appendChild(taskPriorityLow);
-    addtaskForm.appendChild(taskDueDateInputFieldLabel);
-    addtaskForm.appendChild(taskDueDateInputField);
-    addtaskForm.appendChild(taskButtonsDiv);
-    taskButtonsDiv.appendChild(addtaskButton);
-    taskButtonsDiv.appendChild(canceltaskButton);
+    addTaskForm.appendChild(taskDueDateInputFieldLabel);
+    addTaskForm.appendChild(taskDueDateInputField);
+    addTaskForm.appendChild(taskButtonsDiv);
+    taskButtonsDiv.appendChild(addTaskButton);
+    taskButtonsDiv.appendChild(cancelTaskButton);
     taskTitleInputField.focus();
 
-    newtaskButtonClicked = true;
+    newTaskButtonClicked = true;
 
-    let addtaskButtonClicked = false;
+    let addTaskButtonClicked = false;
 
-    let addtaskFormContainer = document.getElementById("add-task-form");
+    let addTaskFormContainer = document.getElementById("add-task-form");
 
     // when submit action is clicked then add the new task to the tasks array
     // of the currently clicked project & remove the form elements then
     // re-display the tasks array in the tasks div
-    addtaskForm.addEventListener("submit", function(e) {
-        if (addtaskButtonClicked) {
+    addTaskForm.addEventListener("submit", function(event) {
+        if (addTaskButtonClicked) {
             return;
         }
-        e.preventDefault();
-        addtaskButtonClicked = true;
-        let newtaskTitle = taskTitleInputField.value;
-        let newtaskDescription = taskDescriptionInputField.value;
-        let newtaskPriority = taskPrioritySelect.value;
-        let newtaskDueDate = taskDueDateInputField.value;
+        event.preventDefault();
+        addTaskButtonClicked = true;
+        let newTaskTitle = taskTitleInputField.value;
+        let newTaskDescription = taskDescriptionInputField.value;
+        let newTaskPriority = taskPrioritySelect.value;
+        let newTaskDueDate = taskDueDateInputField.value;
         projects[selectedProject].tasks.push(
             TaskFactory(
-                newtaskTitle,
-                newtaskDescription,
-                newtaskPriority,
-                newtaskDueDate
+                newTaskTitle,
+                newTaskDescription,
+                newTaskPriority,
+                newTaskDueDate
             )
         );
 
-        showtasks(selectedProject);
-        newtaskButtonClicked = false;
-        addtaskFormContainer.remove();
-        addtaskFormDiv.classList.add("hidden");
+        localStorage.setItem("projects", JSON.stringify(projects));
+
+        showTasks(selectedProject);
+        newTaskButtonClicked = false;
+        addTaskFormContainer.remove();
+        addTaskFormDiv.classList.add("hidden");
     });
 
     // if cancel button is clicked then remove the form elements from the DOM
-    canceltaskButton.addEventListener("click", () => {
-        newtaskButtonClicked = false;
-        addtaskFormContainer.remove();
-        addtaskFormDiv.classList.add("hidden");
+    cancelTaskButton.addEventListener("click", () => {
+        newTaskButtonClicked = false;
+        addTaskFormContainer.remove();
+        addTaskFormDiv.classList.add("hidden");
     })
 }
 
 // display projects and tasks on page load
 showProjects();
-showtasks(selectedProject);
+showTasks(selectedProject);
 
-// highlight default "Random Tasks" project on page load
-const randomTasksProject = document.getElementById("0").classList.add("clicked");
+
+if (projects[0] && projects[0].projectTitle === "Random Tasks") {
+    // highlight default "Random Tasks" project on page load
+    const randomTasksProject = document.getElementById("0").classList.add("clicked");
+}
+
+let projectContainers = document.querySelectorAll(".project-container");
+let targetProjectToHighlightIndex = (selectedProject-1).toString();
+projectContainers[targetProjectToHighlightIndex].classList.add("clicked");
