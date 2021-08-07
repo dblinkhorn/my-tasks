@@ -574,9 +574,3 @@ showTasks(selectedProject);
 
 // highlights top project on page load
 highlightSelectedProject(selectedProject);
-
-
-// if (projects[0] && projects[0].projectTitle === "Random Tasks") {
-//     // highlight default "Random Tasks" project on page load
-//     const randomTasksProject = document.getElementById("0").classList.add("clicked");
-// }
