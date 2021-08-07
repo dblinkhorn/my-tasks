@@ -1,3 +1,7 @@
+// gotta fix selected project highlight effect on page load after user has deleted default project
+// also need to test behavior when there are no projects
+
+
 // object factory for creating project instances
 const ProjectFactory = (projectTitle) => {
     return {
@@ -55,9 +59,14 @@ const highlightSelectedProject = (selectedProject) => {
     })
 }
 
+// sets selectedProject to first (non-null) project in projects array
 for (project of projects) {
+    if (project === null) {
+      continue;
+    }
     if (project) {
-        selectedProject = Number(projects.indexOf(project));
+        let topProject = projects.indexOf(project);
+        selectedProject = topProject;
         break;
     }
 }
@@ -123,127 +132,134 @@ const showTasks = (clickedProject) => {
     const taskListDiv = document.getElementById("tasks-list");
     taskListDiv.textContent = "";
 
-    projects[clickedProject].tasks.forEach((task) => {
 
-        let taskContainer = document.createElement("div");
-        taskContainer.classList = "task-container hover pointer";
+    try {
+        projects[clickedProject].tasks.forEach((task) => {
 
-        let taskItem = document.createElement("div");
-        taskItem.classList = "task-item";
-        taskItem.id = projects[clickedProject].tasks.indexOf(task);
-
-        let taskItemIndex = projects[clickedProject].tasks.indexOf(task);
-        try {
-            taskItem.textContent = projects[clickedProject].tasks[taskItemIndex].taskTitle;
-        }
-
-        catch (e) {
-            return;
-        }
-        taskListDiv.appendChild(taskContainer);
-        taskContainer.appendChild(taskItem);
-
-        // add expand buttons to each task item
-        let taskExpandButton = document.createElement("div");
-        taskExpandButton.classList = "task-expand-button hover";
-        taskExpandButton.id = projects[clickedProject].tasks.indexOf(task);
-        taskExpandButton.textContent = "MORE >";
-        taskContainer.appendChild(taskExpandButton);
-
-        let expandButtonClicked = false;
-
-        taskExpandButton.addEventListener("click", (event) => {
-            taskExpandButton.setAttribute("display", "inline");
-            let targetExpandIndex = Number(event.target.id);
-            const taskExpandContainer = document.createElement("div");
-            const taskDescriptionValue = document.createElement("div");
-            const taskPriorityValue = document.createElement("div");
-            const taskDueDateValue = document.createElement("div");
-
-            taskExpandContainer.id = "task-expand-container";
-            taskExpandContainer.classList = "task-expand-container";
-
-            taskDescriptionValue.id = `task-description-value-${targetExpandIndex.toString()}`;
-            taskDescriptionValue.classList = "task-description-value";
-            taskDescriptionValue.innerHTML = `DESCRIPTION: ${projects[clickedProject].tasks[targetExpandIndex].taskDescription}`;
-
-            taskPriorityValue.id = `task-priority-value-${targetExpandIndex.toString()}`;
-            taskPriorityValue.classList = "task-priority-value";
-            taskPriorityValue.innerHTML = `PRIORITY: ${projects[clickedProject].tasks[targetExpandIndex].taskPriority}`;
-            
-            taskDueDateValue.id = `task-due-date-value-${targetExpandIndex.toString()}`;
-            taskDueDateValue.classList = "task-due-date-value";
-            if (projects[clickedProject].tasks[targetExpandIndex].taskDueDate === "") {
-                taskDueDateValue.innerHTML = "DUE DATE: None";
-            } else {
-                taskDueDateValue.innerHTML = `DUE DATE: ${projects[clickedProject].tasks[targetExpandIndex].taskDueDate}`;
+            let taskContainer = document.createElement("div");
+            taskContainer.classList = "task-container hover pointer";
+    
+            let taskItem = document.createElement("div");
+            taskItem.classList = "task-item";
+            taskItem.id = projects[clickedProject].tasks.indexOf(task);
+    
+            let taskItemIndex = projects[clickedProject].tasks.indexOf(task);
+            try {
+                taskItem.textContent = projects[clickedProject].tasks[taskItemIndex].taskTitle;
             }
-
-            if (expandButtonClicked) {
-                let taskDescription = document.getElementById(`task-description-value-${targetExpandIndex.toString()}`);
-                let taskPriority = document.getElementById(`task-priority-value-${targetExpandIndex.toString()}`);
-                let taskDueDate = document.getElementById(`task-due-date-value-${targetExpandIndex.toString()}`);
-                taskDescription.remove();
-                taskPriority.remove();
-                taskDueDate.remove();
-                taskExpandButton.textContent = "MORE >";
-                taskContainer.classList.remove("clicked");
-                return expandButtonClicked = false;
+    
+            catch (e) {
+                return;
             }
-
-            taskContainer.appendChild(taskExpandContainer);
-            taskExpandContainer.appendChild(taskDescriptionValue);
-            taskExpandContainer.appendChild(taskPriorityValue);
-            taskExpandContainer.appendChild(taskDueDateValue);
-
-            taskExpandButton.textContent = "< LESS";
-
-            expandButtonClicked = true;
-            taskContainer.classList.add("clicked");
-        })
-
-        // add delete buttons to each task item
-        let taskDeleteButton = document.createElement("div");
-        taskDeleteButton.classList = "task-delete-button hover";
-        taskDeleteButton.id = projects[clickedProject].tasks.indexOf(task);
-        taskDeleteButton.textContent = "\u00D7";
-        taskContainer.appendChild(taskDeleteButton);
-
-        // defines behavior when a delete button is clicked
-        let taskDeleteButtons = document.querySelectorAll(".task-delete-button");
-        taskDeleteButtons.forEach((taskDeleteButton) => {
-            taskDeleteButton.addEventListener("click", (event) => {
-                let targetTaskIndex = Number(event.target.id);
-                delete projects[clickedProject].tasks[targetTaskIndex];
-                localStorage.setItem("projects", JSON.stringify(projects));
-                event.target.parentElement.remove();
+            taskListDiv.appendChild(taskContainer);
+            taskContainer.appendChild(taskItem);
+    
+            // add expand buttons to each task item
+            let taskExpandButton = document.createElement("div");
+            taskExpandButton.classList = "task-expand-button hover";
+            taskExpandButton.id = projects[clickedProject].tasks.indexOf(task);
+            taskExpandButton.textContent = "MORE >";
+            taskContainer.appendChild(taskExpandButton);
+    
+            let expandButtonClicked = false;
+    
+            taskExpandButton.addEventListener("click", (event) => {
+                taskExpandButton.setAttribute("display", "inline");
+                let targetExpandIndex = Number(event.target.id);
+                const taskExpandContainer = document.createElement("div");
+                const taskDescriptionValue = document.createElement("div");
+                const taskPriorityValue = document.createElement("div");
+                const taskDueDateValue = document.createElement("div");
+    
+                taskExpandContainer.id = "task-expand-container";
+                taskExpandContainer.classList = "task-expand-container";
+    
+                taskDescriptionValue.id = `task-description-value-${targetExpandIndex.toString()}`;
+                taskDescriptionValue.classList = "task-description-value";
+                taskDescriptionValue.innerHTML = `DESCRIPTION: ${projects[clickedProject].tasks[targetExpandIndex].taskDescription}`;
+    
+                taskPriorityValue.id = `task-priority-value-${targetExpandIndex.toString()}`;
+                taskPriorityValue.classList = "task-priority-value";
+                taskPriorityValue.innerHTML = `PRIORITY: ${projects[clickedProject].tasks[targetExpandIndex].taskPriority}`;
+                
+                taskDueDateValue.id = `task-due-date-value-${targetExpandIndex.toString()}`;
+                taskDueDateValue.classList = "task-due-date-value";
+                if (projects[clickedProject].tasks[targetExpandIndex].taskDueDate === "") {
+                    taskDueDateValue.innerHTML = "DUE DATE: None";
+                } else {
+                    taskDueDateValue.innerHTML = `DUE DATE: ${projects[clickedProject].tasks[targetExpandIndex].taskDueDate}`;
+                }
+    
+                if (expandButtonClicked) {
+                    let taskDescription = document.getElementById(`task-description-value-${targetExpandIndex.toString()}`);
+                    let taskPriority = document.getElementById(`task-priority-value-${targetExpandIndex.toString()}`);
+                    let taskDueDate = document.getElementById(`task-due-date-value-${targetExpandIndex.toString()}`);
+                    taskDescription.remove();
+                    taskPriority.remove();
+                    taskDueDate.remove();
+                    taskExpandButton.textContent = "MORE >";
+                    taskContainer.classList.remove("clicked");
+                    return expandButtonClicked = false;
+                }
+    
+                taskContainer.appendChild(taskExpandContainer);
+                taskExpandContainer.appendChild(taskDescriptionValue);
+                taskExpandContainer.appendChild(taskPriorityValue);
+                taskExpandContainer.appendChild(taskDueDateValue);
+    
+                taskExpandButton.textContent = "< LESS";
+    
+                expandButtonClicked = true;
+                taskContainer.classList.add("clicked");
             })
-        })
-
-        // add finished buttons to each task item
-        let taskFinishedButton = document.createElement("div");
-        taskFinishedButton.classList = "task-finished-button hover";
-        taskFinishedButton.id = projects[clickedProject].tasks.indexOf(task);
-        taskFinishedButton.innerHTML = "&#10061";
-        taskContainer.appendChild(taskFinishedButton);
-
-        // defines behavior when a finished button is clicked
-        let taskFinishedButtons = document.querySelectorAll(".task-finished-button");
-        taskFinishedButtons.forEach((taskFinishedButton) => {
-            taskFinishedButton.addEventListener("click", (event) => {
-                let targetTaskIndex = Number(event.target.id);
-                let finishedTask = projects[clickedProject].tasks[targetTaskIndex];
-                projects[clickedProject].finishedTasks.push(finishedTask);
-                delete projects[clickedProject].tasks[targetTaskIndex];
-                localStorage.setItem("projects", JSON.stringify(projects));
-                taskFinishedButton.innerHTML = "\&#10004";
-                setTimeout(() => {
+    
+            // add delete buttons to each task item
+            let taskDeleteButton = document.createElement("div");
+            taskDeleteButton.classList = "task-delete-button hover";
+            taskDeleteButton.id = projects[clickedProject].tasks.indexOf(task);
+            taskDeleteButton.textContent = "\u00D7";
+            taskContainer.appendChild(taskDeleteButton);
+    
+            // defines behavior when a delete button is clicked
+            let taskDeleteButtons = document.querySelectorAll(".task-delete-button");
+            taskDeleteButtons.forEach((taskDeleteButton) => {
+                taskDeleteButton.addEventListener("click", (event) => {
+                    let targetTaskIndex = Number(event.target.id);
+                    delete projects[clickedProject].tasks[targetTaskIndex];
+                    localStorage.setItem("projects", JSON.stringify(projects));
                     event.target.parentElement.remove();
-                    showTasks(selectedProject);
-                }, 250);
+                })
+            })
+    
+            // add finished buttons to each task item
+            let taskFinishedButton = document.createElement("div");
+            taskFinishedButton.classList = "task-finished-button hover";
+            taskFinishedButton.id = projects[clickedProject].tasks.indexOf(task);
+            taskFinishedButton.innerHTML = "&#10061";
+            taskContainer.appendChild(taskFinishedButton);
+    
+            // defines behavior when a finished button is clicked
+            let taskFinishedButtons = document.querySelectorAll(".task-finished-button");
+            taskFinishedButtons.forEach((taskFinishedButton) => {
+                taskFinishedButton.addEventListener("click", (event) => {
+                    let targetTaskIndex = Number(event.target.id);
+                    let finishedTask = projects[clickedProject].tasks[targetTaskIndex];
+                    projects[clickedProject].finishedTasks.push(finishedTask);
+                    delete projects[clickedProject].tasks[targetTaskIndex];
+                    localStorage.setItem("projects", JSON.stringify(projects));
+                    taskFinishedButton.innerHTML = "\&#10004";
+                    setTimeout(() => {
+                        event.target.parentElement.remove();
+                        showTasks(selectedProject);
+                    }, 250);
+                })
             })
         })
-    })
+    }
+
+    catch (e) {
+        return;
+    }
 
     clearFinishedTasks();
     showFinishedTasks(selectedProject);
@@ -556,12 +572,11 @@ const addNewTaskDiv = () => {
 showProjects();
 showTasks(selectedProject);
 
+// highlights top project on page load
+highlightSelectedProject(selectedProject);
 
-if (projects[0] && projects[0].projectTitle === "Random Tasks") {
-    // highlight default "Random Tasks" project on page load
-    const randomTasksProject = document.getElementById("0").classList.add("clicked");
-}
 
-let projectContainers = document.querySelectorAll(".project-container");
-let targetProjectToHighlightIndex = (selectedProject-1).toString();
-projectContainers[targetProjectToHighlightIndex].classList.add("clicked");
+// if (projects[0] && projects[0].projectTitle === "Random Tasks") {
+//     // highlight default "Random Tasks" project on page load
+//     const randomTasksProject = document.getElementById("0").classList.add("clicked");
+// }
